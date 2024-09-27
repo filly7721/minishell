@@ -1,0 +1,10 @@
+{
+	"files.associations": {
+		"libft.h": "c",
+		"readline.h": "c",
+		"memory.h": "c",
+		"sstream": "c",
+		"locale": "c",
+		"string": "c"
+	}
+}
