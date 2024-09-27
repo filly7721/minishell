@@ -24,17 +24,19 @@ int	push_word(t_list **head, char *str, int *end)
 	i = 0;
 	while (str[i] && str[i] != ' ')
 	{
-		while (str[i] && !ft_strchr(" \"'", str[i]))
-			i++;
-		if (str[i] == '"')
-			res = ft_strchr(str + i + 1, '"');
-		else if (str[i] == '\'')
-			res = ft_strchr(str + i + 1, '\'');
-		else
-			continue ;
-		if (!res)
-			return (0);
-		i = res - str + 1;
+		if (str[i] == '\\')
+			i += 2;
+		if (ft_strchr("'\"", str[i]))
+		{
+			if (str[i] == '"')
+				res = ft_strchr(str + i + 1, '"');
+			else if (str[i] == '\'')
+				res = ft_strchr(str + i + 1, '\'');
+			if (!res)
+				return (0);
+			i = res - str;
+		}
+		i++;
 	}
 	res = malloc(sizeof(char) * (i + 1));
 	ft_strlcpy(res, str, i + 1);
