@@ -1,4 +1,4 @@
-SRCS		=	parse.c
+SRCS		=	rec_des.c
 
 OBJS		=	${SRCS:.c=.o}
 
