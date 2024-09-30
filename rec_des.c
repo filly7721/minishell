@@ -54,67 +54,148 @@ char	*find_unescaped(char *str, char c)
 	return (NULL);
 }
 
-t_tree	*rec_desc(char *str, char symbol)
+t_tree	*create_node(char *str)
 {
-	char	*curr;
 	t_tree	*node;
-	char	*left;
-	char	*right;
-	
-	if (!str)
-		return (NULL);
+
 	node = malloc(sizeof(t_tree));
 	if (!node)
 		return (NULL);
-	curr = find_unescaped(str, symbol);
-	left = NULL;
-	right = NULL;
-	node->cmd.type = WORD;
+	node->left = NULL;
+	node->right = NULL;
 	node->cmd.str = str;
-	if (curr)
-	{
-		left = str;
-		right = curr + 1;
-		*curr = '\0';
-		node->cmd.type = PIPE;
-	}
-	node->left = rec_desc(left, symbol);
-	node->right = rec_desc(right, symbol);
+	node->cmd.type = WORD;
 	return (node);
 }
 
-// t_tree	*create_node(char *str)
-// {
-// 	t_tree	*node;
+void	free_null(void **ptr)
+{
+	free(*ptr);
+	*ptr = NULL;
+}
 
-// 	node = malloc(sizeof(t_tree));
-// 	if (!node)
-// 		return (NULL);
-// 	node->left = NULL;
-// 	node->right = NULL;
-// 	node->cmd.str = NULL;
-// 	node->cmd.type = WORD;
-// 	return (node);
-// }
+int	split_node(char *str, char *curr, t_tree **left, t_tree **right)
+{
+	char	*lstr;
+	char	*rstr;
+
+	lstr = ft_substr(str, 0, curr - str);
+	rstr = ft_substr(str, curr - str + 1, -1);
+	if (!lstr || !rstr)
+		return (free(lstr), free(rstr), 0);
+	*left = create_node(lstr);
+	*right = create_node(rstr);
+	if (!*left || !*right)
+		return (free(lstr), free(rstr), free_null((void **)left), free_null((void **)right), 0);
+	return (1);
+}
+
+int	rec_split(t_tree *head, char symbol, t_type type)
+{
+	char	*curr;
+
+	if (head == NULL)
+		return (1);
+	if (head->cmd.type != WORD)
+		return (rec_split(head->left, symbol, type) && rec_split(head->right, symbol, type));
+	curr = find_unescaped(head->cmd.str, symbol);
+	if (!curr)
+		return (1);
+	if (!split_node(head->cmd.str, curr, &head->left, &head->right))
+		return (write(2, "split node failed\n", 18), 0);
+	free(head->cmd.str);
+	head->cmd.str = ft_strdup(" ");
+	head->cmd.str[0] = symbol;
+	head->cmd.type = type;
+	return (rec_split(head->left, symbol, type) && rec_split(head->right, symbol, type));
+}
+
+char	*get_word(char *str)
+{
+	while (*str == ' ')
+		str++;
+	while (*str != '\0')
+	{
+		if (*str == '\\')
+			str++;
+		else if (*str == '"')
+			str = unescaped(str + 1, '"');
+		else if (*str == '\'')
+			str = unescaped(str + 1, '\'');
+		else if (!ft_isalpha(*str))
+			return (str);
+		str++;
+	}
+	return (str);
+}
+
+int	split_word(char *str, char *curr, t_tree **left, t_tree **right)
+{
+	char	*lstr;
+	char	*rstr;
+	char	*tmp;
+
+	rstr = ft_substr(curr, 1, get_word(curr + 1) - curr - 1);
+	if (!rstr)
+		return (0);
+	// tmp = ft_substr(curr, get_word(curr + 1) - curr, -1);
+	tmp = ft_substr(str, 0, curr - str);
+	if (!tmp)
+		return (free(rstr), 0);
+	lstr = ft_strjoin(tmp, curr + ft_strlen(rstr) + 1);
+	free(tmp);
+	if (!lstr)
+		return (free(rstr), 0);
+	*left = create_node(lstr);
+	*right = create_node(rstr);
+	if (!*left || !*right)
+		return (free(lstr), free(rstr), free_null((void **)left), free_null((void **)right), 0);
+	return (1);
+}
+
+int	word_split(t_tree *head, char symbol, t_type type)
+{
+	char	*curr;
+
+	if (head == NULL)
+		return (1);
+	if (head->cmd.type != WORD)
+		return (word_split(head->left, symbol, type) && word_split(head->right, symbol, type));
+	curr = find_unescaped(head->cmd.str, symbol);
+	if (!curr)
+		return (1);
+	if (!split_word(head->cmd.str, curr, &head->left, &head->right))
+		return (write(2, "split node failed\n", 18), 0);
+	free(head->cmd.str);
+	head->cmd.str = ft_strdup(" ");
+	head->cmd.str[0] = symbol;
+	head->cmd.type = type;
+	return (word_split(head->left, symbol, type) && word_split(head->right, symbol, type));
+}
 
 t_tree	*wrapper(char *str)
 {
 	t_tree *head;
 
-	head = rec_desc(str, '|');
+	head = create_node(str);
+	if (!head)
+		return (NULL);
+	if (!rec_split(head, '|', PIPE))
+		return (write(2, "rec split failed\n", 17), NULL);
+	if (!word_split(head, '<', INPUT))
+		return (write(2, "rec split failed\n", 17), NULL);
+	if (!word_split(head, '>', OUTPUT))
+		return (write(2, "rec split failed\n", 17), NULL);
 	return (head);
 }
 
-void rec_print(t_tree *head)
+void rec_print(t_tree *head, int depth)
 {
 	if (!head)
 		return ;
-	rec_print(head->left);
-	if (head->cmd.type == PIPE)
-		printf("|\n");
-	else
-		printf("%s\n", head->cmd.str);
-	rec_print(head->right);
+	rec_print(head->left, depth + 1);
+	printf("%i|%s|\n", depth, head->cmd.str);
+	rec_print(head->right, depth + 1);
 }
 
 int main()
@@ -125,6 +206,5 @@ int main()
 	t_tree *ast;
 
 	ast = wrapper(str);
-	rec_print(ast);
-	free(str);
+	rec_print(ast, 0);
 }
