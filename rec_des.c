@@ -1,29 +1,5 @@
 #include "minishell.h"
 
-typedef enum e_type
-{
-	SLASH,
-	PIPE,
-	OR,
-	AND,
-	INPUT,
-	OUTPUT,
-	WORD,
-}	t_type;
-
-typedef struct s_cmd
-{
-	char	*str;
-	t_type	type;
-}	t_cmd;
-
-typedef struct s_tree
-{
-	t_cmd			cmd;
-	struct s_tree	*left;
-	struct s_tree	*right;
-}	t_tree;
-
 char	*unescaped(char *str, char c)
 {
 	while (*str != '\0')
@@ -189,22 +165,33 @@ t_tree	*wrapper(char *str)
 	return (head);
 }
 
-void rec_print(t_tree *head, int depth)
+void print_tree(t_tree *head, int depth)
 {
+	int	i;
+
 	if (!head)
 		return ;
-	rec_print(head->left, depth + 1);
-	printf("%i|%s|\n", depth, head->cmd.str);
-	rec_print(head->right, depth + 1);
+	print_tree(head->left, depth + 1);
+	i = 0;
+	while (i++ < depth)
+		printf("\t");
+	printf("(%s)\n", head->cmd.str);
+	print_tree(head->right, depth + 1);
 }
 
-int main()
+int main(int ac, char **av, char **env)
 {
+	(void)ac;
+	(void)av;
 	char	*str;
 
-	str = readline("input>");
+	str = readline("input> ");
+	if (!str)
+		return 0;
 	t_tree *ast;
 
 	ast = wrapper(str);
-	rec_print(ast, 0);
+	print_tree(ast, 0);
+	if (execute(ast, env) == false)
+		printf("an error happening in execution\n");
 }

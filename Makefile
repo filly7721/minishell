@@ -1,4 +1,4 @@
-SRCS		=	rec_des.c
+SRCS		=	rec_des.c execution.c
 
 OBJS		=	${SRCS:.c=.o}
 
