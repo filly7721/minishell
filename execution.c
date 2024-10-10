@@ -1,29 +1,6 @@
 #include "minishell.h"
 #include <errno.h>
 
-void	free_strs(char **strs)
-{
-	int	i;
-
-	i = 0;
-	if (strs == NULL)
-		return ;
-	while (strs[i] != NULL)
-		free(strs[i++]);
-	free(strs);
-}
-
-static char	*ft_strappend(char *str1, char *str2)
-{
-	char	*res;
-
-	if (str1 == NULL || str2 == NULL)
-		return (NULL);
-	res = ft_strjoin(str1, str2);
-	free(str1);
-	return (res);
-}
-
 bool	handle_input(t_tree *node, char **env)
 {
 	int	file;
@@ -59,20 +36,19 @@ bool	handle_pipe(t_tree *node, char **env)
 	if (pid == -1)
 		return (close(fds[0]), close(fds[1]), false);
 	if (pid == 0)
+		if (close(fds[0]) == -1 || dup2(fds[1], 1) == -1 || close(fds[1]) == -1
+			|| execute(node->left, env)) //! terrible syntax but 25 lines
+			(printf("an error has occurerd\n"), exit(1));
+	pid = fork();
+	if (pid == -1)
+		return (close(fds[0]), close(fds[1]), false);
+	if (pid == 0)
 	{
-		printf("output from %s\n", node->left->cmd.str);
-		close(fds[0]);
-		if (dup2(fds[1], 1) == -1)
-			(printf("an error has occurerd"), exit(1));
-		close(fds[1]);
-		return (execute(node->left, env));
+		if (close(fds[1]) == -1 || dup2(fds[0], 0) == -1 || close(fds[0]) == -1)
+			(printf("an error has occurerd\n"), exit(1));
+		execute(node->right, env);
 	}
-	printf("input to %s\n", node->right->cmd.str);
-	close(fds[1]);
-	if (dup2(fds[0], 0) == -1)
-		(printf("an error has occurerd"), exit(1));
-	close(fds[0]);
-	return (execute(node->right, env));
+	return (close(fds[1]) != -1 && close(fds[0] != -1));
 }
 
 char	*get_path(char *cmd, char **env)
@@ -86,7 +62,7 @@ char	*get_path(char *cmd, char **env)
 	while (*env && ft_strncmp(*env, "PATH=", 5) != 0)
 		env++;
 	if (!env)
-		return NULL;
+		return (NULL);
 	paths = ft_split(*env + 5, ':');
 	if (!paths)
 		return (NULL);
@@ -134,16 +110,3 @@ bool	execute(t_tree *node, char **env)
 		return (handle_output(node, env));
 	return (handle_cmd(node, env));
 }
-
-
-
-
-// if (fcntl(0, F_GETFD) != -1) {
-// return 1; // Valid file descriptor
-// } else {
-//     if (errno == EBADF) {
-//         return 0; // Invalid file descriptor
-//     } else {
-//         perror("fcntl failed");
-//         return -1; // Some other error occurred
-//     }

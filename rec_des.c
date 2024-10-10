@@ -194,4 +194,6 @@ int main(int ac, char **av, char **env)
 	print_tree(ast, 0);
 	if (execute(ast, env) == false)
 		printf("an error happening in execution\n");
+	while (wait(NULL) != -1)
+		;
 }

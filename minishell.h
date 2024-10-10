@@ -34,7 +34,9 @@ typedef struct s_tree
 	struct s_tree	*right;
 }	t_tree;
 
-
 bool	execute(t_tree *node, char **env);
+
+void	free_strs(char **strs);
+char	*ft_strappend(char *str1, char *str2);
 
 #endif
