@@ -35,8 +35,16 @@ typedef struct s_tree
 }	t_tree;
 
 bool	execute(t_tree *node, char **env);
+t_tree	*construct_ast(char *str);
+
+char	*find_unescaped(char *str, char c);
+t_tree	*create_node(char *str);
+int		split_evenly(char *str, char *curr, t_tree **left, t_tree **right);
+int		split_unevenly(char *str, char *curr, t_tree **left, t_tree **right);
+char	*get_word(char *str);
 
 void	free_strs(char **strs);
 char	*ft_strappend(char *str1, char *str2);
+void	free_null(void **ptr);
 
 #endif

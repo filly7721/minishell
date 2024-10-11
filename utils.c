@@ -22,3 +22,9 @@ char	*ft_strappend(char *str1, char *str2)
 	free(str1);
 	return (res);
 }
+
+void	free_null(void **ptr)
+{
+	free(*ptr);
+	*ptr = NULL;
+}

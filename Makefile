@@ -1,4 +1,6 @@
-SRCS		=	rec_des.c execution.c utils.c
+PARSE_SRCS	=	utils.c rec_des.c
+
+SRCS		=	execution.c utils.c main.c ${addprefix parse/, ${PARSE_SRCS}}
 
 OBJS		=	${SRCS:.c=.o}
 
@@ -6,8 +8,9 @@ LIBFT		=	libft/libft.a
 
 READLINE	=	-L/opt/vagrant/embedded/lib/ -lreadline 
 
-CFLAGS		=	-Wall -Wextra -Werror -Ilibft -g3 -I/opt/vagrant/embedded/include/readline -I/opt/vagrant/embedded/include
-
+CFLAGS		=	-Wall -Wextra -Werror
+CFLAGS		+=	-Ilibft -I./ -I/opt/vagrant/embedded/include/readline -I/opt/vagrant/embedded/include
+CFLAGS		+=	-g3 
 NAME		=	minishell
 
 all			:	${NAME}
