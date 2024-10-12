@@ -1,5 +1,24 @@
 #include "minishell.h"
 
+char	*get_type(t_type type)
+{
+	if (type == SLASH)
+		return ("SLASH");
+	if (type == PIPE)
+		return ("PIPE");
+	if (type == OR)
+		return ("OR");
+	if (type == AND)
+		return ("AND");
+	if (type == INPUT)
+		return ("INPUT");
+	if (type == OUTPUT)
+		return ("OUTPUT");
+	if (type == WORD)
+		return ("WORD");
+	return "NONE";
+}
+
 void	print_tree(t_tree *head, int depth)
 {
 	int	i;
@@ -10,25 +29,34 @@ void	print_tree(t_tree *head, int depth)
 	i = 0;
 	while (i++ < depth)
 		printf("\t");
-	printf("(%s)\n", head->cmd.str);
+	printf("(%s:%s)\n", get_type(head->cmd.type), head->cmd.str);
 	print_tree(head->right, depth + 1);
+}
+
+void	free_tree(t_tree *head)
+{
+	if (head == NULL)
+		return ;
+	free_tree(head->left);
+	free_tree(head->right);
+	free(head->cmd.str);
+	free(head);
 }
 
 int	main(int ac, char **av, char **env)
 {
+	char	*str;
+	t_tree	*ast;
 	(void)ac;
 	(void)av;
-	char	*str;
+	(void)env;
 
 	str = readline("input> ");
 	if (!str)
 		return 0;
-	t_tree *ast;
 
 	ast = construct_ast(str);
 	print_tree(ast, 0);
-	if (execute(ast, env) == false)
-		printf("an error happening in execution\n");
-	while (wait(NULL) != -1)
-		;
+	printf("exit status is %d\n", execute(ast, env));
+	free_tree(ast);
 }

@@ -1,54 +1,66 @@
 #include "minishell.h"
-#include <errno.h>
 
-bool	handle_input(t_tree *node, char **env)
+int	execute_tree(t_tree *node, char **env);
+
+void	handle_input(t_tree *node, char **env)
 {
 	int	file;
 
 	file = open(node->right->cmd.str, O_RDONLY);
 	if (file == -1)
-		(ft_putstr_fd("file error", 2), exit(1));
+	//TODO FILE ERROR HANDLING
+		(ft_putstr_fd("file error\n", 2), exit(1));
 	if (dup2(file, 0) == -1)
-		(ft_putendl_fd("an error has occured", 2), exit(1));
-	return (execute(node->left, env));
+		(ft_putstr_fd("an error has occured\n", 2), exit(1));
+	execute_tree(node->left, env);
 }
 
-bool	handle_output(t_tree *node, char **env)
+void	handle_output(t_tree *node, char **env)
 {
 	int	file;
 
 	file = open(node->right->cmd.str, O_WRONLY | O_CREAT, 0644);
 	if (file == -1)
-		(ft_putstr_fd("file error", 2), exit(1));
+		(ft_putstr_fd("file error\n", 2), exit(1));
 	if (dup2(file, 1) == -1)
-		(ft_putendl_fd("an error has occured", 2), exit(1));
-	return (execute(node->left, env));
+		(ft_putstr_fd("an error has occured\n", 2), exit(1));
+	execute_tree(node->left, env);
 }
 
-bool	handle_pipe(t_tree *node, char **env)
+bool	connect_pipe(int fds[2], int fd)
+{
+	if (close(fds[1 - fd]) == -1)
+		return (close(fds[fd]), false);
+	if (dup2(fds[fd], fd) == -1)
+		return (close(fds[fd]), false);
+	if (close(fds[fd]) == -1)
+		return (false);
+	return (true);
+}
+
+void	handle_pipe(t_tree *node, char **env)
 {
 	int		fds[2];
 	pid_t	pid;
+	int		status;
 
 	if (pipe(fds) == -1)
-		return (false);
+		(ft_putstr_fd("an error has occurred\n", 2), exit(1));
 	pid = fork();
 	if (pid == -1)
-		return (close(fds[0]), close(fds[1]), false);
+		(close(fds[0]), close(fds[1]), ft_putstr_fd("an error has occurred\n", 2), exit(1));
 	if (pid == 0)
-		if (close(fds[0]) == -1 || dup2(fds[1], 1) == -1 || close(fds[1]) == -1
-			|| execute(node->left, env)) //! terrible syntax but 25 lines
-			(printf("an error has occurerd\n"), exit(1));
+		if (!connect_pipe(fds, 1) || !execute_tree(node->left, env))
+			(ft_putstr_fd("an error has occurred\n", 2), exit(1));
 	pid = fork();
 	if (pid == -1)
-		return (close(fds[0]), close(fds[1]), false);
+		(close(fds[0]), close(fds[1]), ft_putstr_fd("an error has occurred\n", 2), exit(1));
 	if (pid == 0)
-	{
-		if (close(fds[1]) == -1 || dup2(fds[0], 0) == -1 || close(fds[0]) == -1)
-			(printf("an error has occurerd\n"), exit(1));
-		execute(node->right, env);
-	}
-	return (close(fds[1]) != -1 && close(fds[0] != -1));
+		if (!connect_pipe(fds, 0) || !execute_tree(node->right, env))
+			(ft_putstr_fd("an error has occurred\n", 2), exit(1));
+	(close(fds[1]), close(fds[0]));
+	(waitpid(pid, &status, 0), wait(NULL));
+	exit(WEXITSTATUS(status));
 }
 
 char	*get_path(char *cmd, char **env)
@@ -76,37 +88,52 @@ char	*get_path(char *cmd, char **env)
 			return (free_strs(paths), path);
 		free(path);
 	}
-	return (NULL);
+	return (free_strs(paths), NULL);
 }
 
-bool	handle_cmd(t_tree *node, char **env)
+void	handle_word(t_tree *node, char **env)
 {
-	char	**cmd;
-	char	*path;
+	char	*cmd;
+	char	**strs;
 
-	cmd = ft_split(node->cmd.str, ' ');
+	strs = ft_split(node->cmd.str, ' ');
+	if (!strs)
+		(ft_putstr_fd("an error has occurred\n", 2), exit(1));
+	cmd = get_path(strs[0], env);
 	if (!cmd)
-		return (false);
-	path = get_path(cmd[0], env);
-	if (!path)
-		return (false);
-	execve(path, cmd, env);
+		(ft_putstr_fd("an error has occurred\n", 2), exit(1));
+	execve(cmd, strs, env);
 	ft_putstr_fd("an error has occured executing ", 2);
-	ft_putendl_fd(cmd[0], 2);
-	free_strs(cmd);
-	free(path);
+	// TODO handle error codes
+	ft_putendl_fd(strs[0], 2);
+	free_strs(strs);
+	free(cmd);
 	exit(127);
 }
 
-bool	execute(t_tree *node, char **env)
+int	execute_tree(t_tree *node, char **env)
 {
-	if (!node)
-		return (1);
 	if (node->cmd.type == PIPE)
-		return (handle_pipe(node, env));
-	if (node->cmd.type == INPUT)
-		return (handle_input(node, env));
-	if (node->cmd.type == OUTPUT)
-		return (handle_output(node, env));
-	return (handle_cmd(node, env));
+		handle_pipe(node, env);
+	else if (node->cmd.type == WORD)
+		handle_word(node, env);
+	else if (node->cmd.type == INPUT)
+		handle_input(node, env);
+	else if (node->cmd.type == OUTPUT)
+		handle_output(node, env);
+	else
+		ft_putstr_fd("unknown type in tree\n", 2);
+	return (1);
+}
+
+int		execute(t_tree *node, char **env)
+{
+	pid_t	pid;
+	int		status;
+
+	pid = fork();
+	if (pid == 0)
+		execute_tree(node, env);
+	waitpid(pid, &status, 0);
+	return (WEXITSTATUS(status));
 }

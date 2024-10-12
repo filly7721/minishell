@@ -8,7 +8,7 @@
 # include <stdbool.h>
 # include "readline/readline.h"
 # include "libft.h"
-// # include "sys/wait.h"
+#include <sys/wait.h>
 
 typedef enum e_type
 {
@@ -34,7 +34,7 @@ typedef struct s_tree
 	struct s_tree	*right;
 }	t_tree;
 
-bool	execute(t_tree *node, char **env);
+int		execute(t_tree *node, char **env);
 t_tree	*construct_ast(char *str);
 
 char	*find_unescaped(char *str, char c);
