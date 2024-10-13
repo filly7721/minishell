@@ -10,6 +10,15 @@
 # include "libft.h"
 #include <sys/wait.h>
 
+typedef	struct s_context
+{
+	int		input;
+	int		output;
+	char	*cmd;
+	char	**args;
+	bool	is_error;
+}	t_context;
+
 typedef enum e_type
 {
 	SLASH,

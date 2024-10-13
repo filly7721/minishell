@@ -1,66 +1,92 @@
 #include "minishell.h"
 
-int	execute_tree(t_tree *node, char **env);
+bool	traverse_tree(t_tree *node, char **env, t_context *context);
 
-void	handle_input(t_tree *node, char **env)
+void	set_context(t_context *context)
 {
-	int	file;
-
-	file = open(node->right->cmd.str, O_RDONLY);
-	if (file == -1)
-	//TODO FILE ERROR HANDLING
-		(ft_putstr_fd("file error\n", 2), exit(1));
-	if (dup2(file, 0) == -1)
-		(ft_putstr_fd("an error has occured\n", 2), exit(1));
-	execute_tree(node->left, env);
+	context->args = NULL;
+	context->cmd = NULL;
+	context->input = -1;
+	context->output = -1;
+	context->is_error = false;
 }
 
-void	handle_output(t_tree *node, char **env)
+void	reset_context(t_context *context)
 {
-	int	file;
-
-	file = open(node->right->cmd.str, O_WRONLY | O_CREAT, 0644);
-	if (file == -1)
-		(ft_putstr_fd("file error\n", 2), exit(1));
-	if (dup2(file, 1) == -1)
-		(ft_putstr_fd("an error has occured\n", 2), exit(1));
-	execute_tree(node->left, env);
+	free_strs(context->args);
+	context->args = NULL;
+	free(context->cmd);
+	context->cmd = NULL;
+	close(context->input);
+	context->input = -1;
+	close(context->output);
+	context->output = -1;
+	context->is_error = false;
 }
 
-bool	connect_pipe(int fds[2], int fd)
+void	execute_cmd(t_context *context, char **env)
 {
-	if (close(fds[1 - fd]) == -1)
-		return (close(fds[fd]), false);
-	if (dup2(fds[fd], fd) == -1)
-		return (close(fds[fd]), false);
-	if (close(fds[fd]) == -1)
+	if (context->is_error)
+	{
+		reset_context(context);
+		exit(1);
+	}
+	if (context->input != -1)
+		(dup2(context->input, 0), close(context->input));
+	if (context->output != -1)
+		(dup2(context->output, 1), close(context->output));
+	execve(context->cmd, context->args, env);
+	ft_putstr_fd("an error has occurered executing: ", 2);
+	ft_putendl_fd(context->cmd, 2);
+	free_strs(context->args);
+	free(context->cmd);
+	exit(127);
+}
+
+bool	handle_input(t_tree *node, char **env, t_context *context)
+{
+	close(context->input);
+	context->input = open(node->right->cmd.str, O_RDONLY);
+	if (context->input == -1)
+	{
+		ft_putstr_fd("file error\n", 2);
+		context->is_error = true;
 		return (false);
-	return (true);
+	}
+	return (traverse_tree(node->left, env, context));
 }
 
-void	handle_pipe(t_tree *node, char **env)
+bool	handle_output(t_tree *node, char **env, t_context *context)
 {
-	int		fds[2];
-	pid_t	pid;
-	int		status;
+	close(context->output);
+	context->output = open(node->right->cmd.str, O_WRONLY | O_CREAT);
+	if (context->input == -1)
+	{
+		ft_putstr_fd("file error\n", 2);
+		context->is_error = true;
+		return (false);
+	}
+	return (traverse_tree(node->left, env, context));
+}
 
-	if (pipe(fds) == -1)
-		(ft_putstr_fd("an error has occurred\n", 2), exit(1));
+bool	handle_pipe(t_tree *node, char **env, t_context *context)
+{
+	pid_t	pid;
+	int		fds[2];
+
+	pipe(fds);
+	context->output = fds[1];
+	traverse_tree(node->left, env, context);
 	pid = fork();
-	if (pid == -1)
-		(close(fds[0]), close(fds[1]), ft_putstr_fd("an error has occurred\n", 2), exit(1));
 	if (pid == 0)
-		if (!connect_pipe(fds, 1) || !execute_tree(node->left, env))
-			(ft_putstr_fd("an error has occurred\n", 2), exit(1));
-	pid = fork();
-	if (pid == -1)
-		(close(fds[0]), close(fds[1]), ft_putstr_fd("an error has occurred\n", 2), exit(1));
-	if (pid == 0)
-		if (!connect_pipe(fds, 0) || !execute_tree(node->right, env))
-			(ft_putstr_fd("an error has occurred\n", 2), exit(1));
-	(close(fds[1]), close(fds[0]));
-	(waitpid(pid, &status, 0), wait(NULL));
-	exit(WEXITSTATUS(status));
+	{
+		close(fds[0]);
+		execute_cmd(context, env);
+	}
+	close(fds[1]);
+	reset_context(context);
+	context->input = fds[0];
+	return (traverse_tree(node->right, env, context));
 }
 
 char	*get_path(char *cmd, char **env)
@@ -91,49 +117,54 @@ char	*get_path(char *cmd, char **env)
 	return (free_strs(paths), NULL);
 }
 
-void	handle_word(t_tree *node, char **env)
+bool	handle_word(t_tree *node, char **env, t_context *context)
 {
-	char	*cmd;
-	char	**strs;
-
-	strs = ft_split(node->cmd.str, ' ');
-	if (!strs)
-		(ft_putstr_fd("an error has occurred\n", 2), exit(1));
-	cmd = get_path(strs[0], env);
-	if (!cmd)
-		(ft_putstr_fd("an error has occurred\n", 2), exit(1));
-	execve(cmd, strs, env);
-	ft_putstr_fd("an error has occured executing ", 2);
-	// TODO handle error codes
-	ft_putendl_fd(strs[0], 2);
-	free_strs(strs);
-	free(cmd);
-	exit(127);
+	context->args = ft_split(node->cmd.str, ' ');
+	if (!context->args)
+	{
+		ft_putstr_fd("an error has occurred\n", 2);
+		context->is_error = true;
+		return (false);
+	}
+	context->cmd = get_path(context->args[0], env);
+	if (!context->cmd)
+	{
+		ft_putstr_fd("an error has occurred\n", 2);
+		context->is_error = true;
+		return (false);
+	}
+	return (true);
 }
 
-int	execute_tree(t_tree *node, char **env)
+bool	traverse_tree(t_tree *node, char **env, t_context *context)
 {
 	if (node->cmd.type == PIPE)
-		handle_pipe(node, env);
+		return (handle_pipe(node, env, context));
 	else if (node->cmd.type == WORD)
-		handle_word(node, env);
+		return (handle_word(node, env, context));
 	else if (node->cmd.type == INPUT)
-		handle_input(node, env);
+		return (handle_input(node, env, context));
 	else if (node->cmd.type == OUTPUT)
-		handle_output(node, env);
+		return (handle_output(node, env, context));
 	else
 		ft_putstr_fd("unknown type in tree\n", 2);
-	return (1);
+	return (false);
 }
 
-int		execute(t_tree *node, char **env)
+int	execute(t_tree *node, char **env)
 {
-	pid_t	pid;
-	int		status;
+	t_context	context;
+	pid_t		pid;
+	int			status;
 
+	set_context(&context);
+	traverse_tree(node, env, &context);
 	pid = fork();
 	if (pid == 0)
-		execute_tree(node, env);
+		execute_cmd(&context, env);
+	reset_context(&context);
 	waitpid(pid, &status, 0);
+	while (wait(NULL) != -1)
+		;
 	return (WEXITSTATUS(status));
 }
