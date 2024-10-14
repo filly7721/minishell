@@ -13,7 +13,7 @@ char	*unescaped_end(char *str, char c)
 	return (0);
 }
 
-char	*find_unescaped(char *str, char c)
+char	*find_unescaped(char *str, char *symbol)
 {
 	while (*str != '\0')
 	{
@@ -23,7 +23,7 @@ char	*find_unescaped(char *str, char c)
 			str = unescaped_end(str + 1, '"');
 		else if (*str == '\'')
 			str = unescaped_end(str + 1, '\'');
-		else if (*str == c)
+		else if (ft_strncmp(str, symbol, ft_strlen(symbol)) == 0)
 			return (str);
 		str++;
 	}
@@ -61,44 +61,4 @@ t_tree	*create_node(char *str)
 	node->cmd.str = str;
 	node->cmd.type = WORD;
 	return (node);
-}
-
-int	split_evenly(char *str, char *curr, t_tree **left, t_tree **right)
-{
-	char	*lstr;
-	char	*rstr;
-
-	lstr = ft_substr(str, 0, curr - str);
-	rstr = ft_substr(str, curr - str + 1, -1);
-	if (!lstr || !rstr)
-		return (free(lstr), free(rstr), 0);
-	*left = create_node(lstr);
-	*right = create_node(rstr);
-	if (!*left || !*right)
-		return (free(lstr), free(rstr), free_null((void **)left), free_null((void **)right), 0);
-	return (1);
-}
-
-int	split_unevenly(char *str, char *curr, t_tree **left, t_tree **right)
-{
-	char	*lstr;
-	char	*rstr;
-	char	*tmp;
-
-	rstr = ft_substr(curr, 1, get_word(curr + 1) - curr - 1);
-	if (!rstr)
-		return (0);
-	// tmp = ft_substr(curr, get_word(curr + 1) - curr, -1);
-	tmp = ft_substr(str, 0, curr - str);
-	if (!tmp)
-		return (free(rstr), 0);
-	lstr = ft_strjoin(tmp, curr + ft_strlen(rstr) + 1);
-	free(tmp);
-	if (!lstr)
-		return (free(rstr), 0);
-	*left = create_node(lstr);
-	*right = create_node(rstr);
-	if (!*left || !*right)
-		return (free(lstr), free(rstr), free_null((void **)left), free_null((void **)right), 0);
-	return (1);
 }

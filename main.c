@@ -16,7 +16,7 @@ char	*get_type(t_type type)
 		return ("OUTPUT");
 	if (type == WORD)
 		return ("WORD");
-	return "NONE";
+	return ("NONE");
 }
 
 void	print_tree(t_tree *head, int depth)
@@ -47,14 +47,13 @@ int	main(int ac, char **av, char **env)
 {
 	char	*str;
 	t_tree	*ast;
+
 	(void)ac;
 	(void)av;
 	(void)env;
-
 	str = readline("input> ");
 	if (!str)
-		return 0;
-
+		return (1);
 	ast = construct_ast(str);
 	print_tree(ast, 0);
 	printf("exit status is %d\n", execute(ast, env));

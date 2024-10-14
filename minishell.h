@@ -8,9 +8,9 @@
 # include <stdbool.h>
 # include "readline/readline.h"
 # include "libft.h"
-#include <sys/wait.h>
+# include <sys/wait.h>
 
-typedef	struct s_context
+typedef struct s_context
 {
 	int		input;
 	int		output;
@@ -43,14 +43,25 @@ typedef struct s_tree
 	struct s_tree	*right;
 }	t_tree;
 
-int		execute(t_tree *node, char **env);
 t_tree	*construct_ast(char *str);
-
-char	*find_unescaped(char *str, char c);
+char	*find_unescaped(char *str, char *symbol);
 t_tree	*create_node(char *str);
 int		split_evenly(char *str, char *curr, t_tree **left, t_tree **right);
 int		split_unevenly(char *str, char *curr, t_tree **left, t_tree **right);
 char	*get_word(char *str);
+
+int		execute(t_tree *node, char **env);
+bool	traverse_tree(t_tree *node, char **env, t_context *context);
+void	execute_cmd(t_context *context, char **env);
+
+bool	handle_input(t_tree *node, char **env, t_context *context);
+bool	handle_output(t_tree *node, char **env, t_context *context);
+bool	handle_pipe(t_tree *node, char **env, t_context *context);
+bool	handle_word(t_tree *node, char **env, t_context *context);
+
+char	*get_path(char *cmd, char **env);
+void	reset_context(t_context *context);
+void	set_context(t_context *context);
 
 void	free_strs(char **strs);
 char	*ft_strappend(char *str1, char *str2);
