@@ -2,21 +2,30 @@
 
 void	execute_cmd(t_context *context, char **env)
 {
-	if (context->is_error)
+	int	status;
+	
+	if (context->error)
 	{
 		reset_context(context);
-		exit(1);
+		exit(context->error);
 	}
 	if (context->input != -1)
 		(dup2(context->input, 0), close(context->input));
 	if (context->output != -1)
 		(dup2(context->output, 1), close(context->output));
 	execve(context->cmd, context->args, env);
-	ft_putstr_fd("an error has occurered executing: ", 2);
-	ft_putendl_fd(context->cmd, 2);
+	status = 127;
+	if (errno == EACCES)
+	{
+		ft_putstr_fd("Permission denied: ", 2);
+		status = 126;
+	}
+	else
+		ft_putstr_fd("Command not found: ", 2);
+	ft_putendl_fd(context->args[0], 2);
 	free_strs(context->args);
 	free(context->cmd);
-	exit(127);
+	exit(status);
 }
 
 bool	traverse_tree(t_tree *node, char **env, t_context *context)
@@ -43,11 +52,15 @@ int	execute(t_tree *node, char **env)
 	set_context(&context);
 	traverse_tree(node, env, &context);
 	pid = fork();
+	if (pid == -1)
+		return (reset_context(&context), ft_putstr_fd("an error has occurered\n", 2), 1);
 	if (pid == 0)
 		execute_cmd(&context, env);
 	reset_context(&context);
 	waitpid(pid, &status, 0);
 	while (wait(NULL) != -1)
 		;
+	if (WIFSIGNALED(status))
+		return (128 + WTERMSIG(status));
 	return (WEXITSTATUS(status));
 }

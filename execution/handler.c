@@ -7,7 +7,7 @@ bool	handle_input(t_tree *node, char **env, t_context *context)
 	if (context->input == -1)
 	{
 		ft_putstr_fd("file error\n", 2);
-		context->is_error = true;
+		context->error = 1;
 		return (false);
 	}
 	return (traverse_tree(node->left, env, context));
@@ -20,7 +20,7 @@ bool	handle_output(t_tree *node, char **env, t_context *context)
 	if (context->input == -1)
 	{
 		ft_putstr_fd("file error\n", 2);
-		context->is_error = true;
+		context->error = 1;
 		return (false);
 	}
 	return (traverse_tree(node->left, env, context));
@@ -35,6 +35,12 @@ bool	handle_pipe(t_tree *node, char **env, t_context *context)
 	context->output = fds[1];
 	traverse_tree(node->left, env, context);
 	pid = fork();
+	if (pid == -1)
+	{
+		close(fds[0]); 
+		close(fds[1]);
+		return (false);
+	}
 	if (pid == 0)
 	{
 		close(fds[0]);
@@ -52,15 +58,9 @@ bool	handle_word(t_tree *node, char **env, t_context *context)
 	if (!context->args)
 	{
 		ft_putstr_fd("an error has occurred\n", 2);
-		context->is_error = true;
+		context->error = 1;
 		return (false);
 	}
 	context->cmd = get_path(context->args[0], env);
-	if (!context->cmd)
-	{
-		ft_putstr_fd("an error has occurred\n", 2);
-		context->is_error = true;
-		return (false);
-	}
 	return (true);
 }

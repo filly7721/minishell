@@ -6,7 +6,7 @@ void	set_context(t_context *context)
 	context->cmd = NULL;
 	context->input = -1;
 	context->output = -1;
-	context->is_error = false;
+	context->error = 0;
 }
 
 void	reset_context(t_context *context)
@@ -19,7 +19,7 @@ void	reset_context(t_context *context)
 	context->input = -1;
 	close(context->output);
 	context->output = -1;
-	context->is_error = false;
+	context->error = 0;
 }
 
 char	*get_path(char *cmd, char **env)

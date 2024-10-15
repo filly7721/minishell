@@ -25,22 +25,12 @@ void	print_tree(t_tree *head, int depth)
 
 	if (!head)
 		return ;
-	print_tree(head->left, depth + 1);
+	print_tree(head->right, depth + 1);
 	i = 0;
 	while (i++ < depth)
 		printf("\t");
 	printf("(%s:%s)\n", get_type(head->cmd.type), head->cmd.str);
-	print_tree(head->right, depth + 1);
-}
-
-void	free_tree(t_tree *head)
-{
-	if (head == NULL)
-		return ;
-	free_tree(head->left);
-	free_tree(head->right);
-	free(head->cmd.str);
-	free(head);
+	print_tree(head->left, depth + 1);
 }
 
 int	main(int ac, char **av, char **env)
@@ -51,7 +41,7 @@ int	main(int ac, char **av, char **env)
 	(void)ac;
 	(void)av;
 	(void)env;
-	str = readline("input> ");
+	str = readline("megashell> ");
 	if (!str)
 		return (1);
 	ast = construct_ast(str);

@@ -42,6 +42,7 @@ char	*get_word(char *str)
 			str = unescaped_end(str + 1, '"');
 		else if (*str == '\'')
 			str = unescaped_end(str + 1, '\'');
+		//TODO implement word rules 
 		else if (!ft_isalpha(*str))
 			return (str);
 		str++;
@@ -61,4 +62,14 @@ t_tree	*create_node(char *str)
 	node->cmd.str = str;
 	node->cmd.type = WORD;
 	return (node);
+}
+
+void	free_tree(t_tree *head)
+{
+	if (head == NULL)
+		return ;
+	free_tree(head->left);
+	free_tree(head->right);
+	free(head->cmd.str);
+	free(head);
 }
