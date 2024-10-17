@@ -17,7 +17,7 @@ bool	handle_output(t_tree *node, char **env, t_context *context)
 {
 	close(context->output);
 	context->output = open(node->right->cmd.str, O_WRONLY | O_CREAT, 0644);
-	if (context->input == -1)
+	if (context->output == -1)
 	{
 		ft_putstr_fd("file error\n", 2);
 		context->error = 1;
