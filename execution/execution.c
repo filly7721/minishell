@@ -1,30 +1,33 @@
 #include "minishell.h"
 
+int	get_execution_error(char *cmd)
+{
+	ft_putstr_fd(cmd, 2);
+	if (errno == EACCES)
+		return	(ft_putstr_fd(": Permission denied\n", 2), 126);
+	if (ft_strchr(cmd, '/') != NULL)
+		ft_putstr_fd(": No such file or directory\n", 2);
+	ft_putstr_fd(": Command not found\n", 2);
+	return (127);
+}
+
 void	execute_cmd(t_context *context, char **env)
 {
 	int	status;
 	
 	if (context->error)
 	{
+		status = context->error;
 		reset_context(context);
-		exit(context->error);
+		exit(status);
 	}
 	if (context->input != -1)
 		(dup2(context->input, 0), close(context->input));
 	if (context->output != -1)
 		(dup2(context->output, 1), close(context->output));
 	execve(context->cmd, context->args, env);
-	status = 127;
-	if (errno == EACCES)
-	{
-		ft_putstr_fd("Permission denied: ", 2);
-		status = 126;
-	}
-	else
-		ft_putstr_fd("Command not found: ", 2);
-	ft_putendl_fd(context->args[0], 2);
-	free_strs(context->args);
-	free(context->cmd);
+	status = get_execution_error(context->args[0]);
+	reset_context(context);
 	exit(status);
 }
 
