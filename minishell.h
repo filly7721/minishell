@@ -28,6 +28,8 @@ typedef enum e_type
 	AND,
 	INPUT,
 	OUTPUT,
+	HEREDOC,
+	APPEND,
 	WORD,
 }	t_type;
 
@@ -50,6 +52,7 @@ t_tree	*create_node(char *str);
 bool	split_evenly(char *str, char *curr, t_tree **left, t_tree **right);
 bool	split_unevenly(char *str, char *curr, t_tree **left, t_tree **right);
 char	*get_word(char *str);
+char	*find_redirect(char *str, t_type *type);
 
 int		execute(t_tree *node, char **env);
 bool	traverse_tree(t_tree *node, char **env, t_context *context);

@@ -73,3 +73,26 @@ void	free_tree(t_tree *head)
 	free(head->cmd.str);
 	free(head);
 }
+
+char	*find_redirect(char *str, t_type *type)
+{
+	while (*str != '\0')
+	{
+		if (*str == '\\')
+			str++;
+		else if (*str == '"')
+			str = unescaped_end(str + 1, '"');
+		else if (*str == '\'')
+			str = unescaped_end(str + 1, '\'');
+		else if (ft_strncmp(str, "<<", 2) == 0)
+			return (*type = HEREDOC, str);
+		else if (ft_strncmp(str, ">>", 2) == 0)
+			return (*type = APPEND, str);
+		else if (ft_strncmp(str, "<", 1) == 0)
+			return (*type = INPUT, str);
+		else if (ft_strncmp(str, ">", 1) == 0)
+			return (*type = OUTPUT, str);
+		str++;
+	}
+	return (NULL);
+}

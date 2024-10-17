@@ -14,6 +14,10 @@ char	*get_type(t_type type)
 		return ("INPUT");
 	if (type == OUTPUT)
 		return ("OUTPUT");
+	if (type == HEREDOC)
+		return ("HEREDOC");
+	if (type == APPEND)
+		return ("APPEND");
 	if (type == WORD)
 		return ("WORD");
 	return ("NONE");

@@ -21,16 +21,14 @@ bool	split_unevenly(char *str, char *curr, t_tree **left, t_tree **right)
 {
 	char	*lstr;
 	char	*rstr;
-	char	*tmp;
 
-	rstr = ft_substr(curr, 1, get_word(curr + 1) - curr - 1);
-	if (!rstr)
+	lstr = ft_strdup(str);
+	if (!lstr)
 		return (false);
-	tmp = ft_substr(str, 0, curr - str);
-	if (!tmp)
-		return (free(rstr), false);
-	lstr = ft_strjoin(tmp, curr + ft_strlen(rstr) + 1);
-	free(tmp);
+	rstr = ft_substr(curr, 0, get_word(curr) - curr);
+	if (!rstr)
+		return (free(lstr), false);
+	lstr = ft_strappend(lstr, curr + ft_strlen(rstr));
 	if (!lstr)
 		return (free(rstr), false);
 	*left = create_node(lstr);
@@ -41,47 +39,46 @@ bool	split_unevenly(char *str, char *curr, t_tree **left, t_tree **right)
 	return (true);
 }
 
-bool	rec_split(t_tree *head, char *symbol, t_type type)
+bool	split_pipes(t_tree *head)
 {
 	char	*curr;
 
 	if (head == NULL)
 		return (1);
 	if (head->cmd.type != WORD)
-		return (rec_split(head->left, symbol, type)
-			&& rec_split(head->right, symbol, type));
-	curr = find_unescaped(head->cmd.str, symbol);
+		return (split_pipes(head->left)
+			&& split_pipes(head->right));
+	curr = find_unescaped(head->cmd.str, "|");
 	if (!curr)
 		return (true);
 	if (!split_evenly(head->cmd.str, curr, &head->left, &head->right))
-		return (ft_putstr_fd("split node failed\n", 2), false);
+		return (ft_putstr_fd("split pipe failed\n", 2), false);
 	free(head->cmd.str);
-	head->cmd.str = ft_strdup(symbol);
-	head->cmd.type = type;
-	return (rec_split(head->left, symbol, type)
-		&& rec_split(head->right, symbol, type));
+	head->cmd.str = ft_strdup("|");
+	head->cmd.type = PIPE;
+	return (split_pipes(head->left) && split_pipes(head->right));
 }
 
-bool	word_split(t_tree *head, char *symbol, t_type type)
+bool	split_redirects(t_tree *head)
 {
 	char	*curr;
 
 	if (head == NULL)
-		return (true);
+		return (1);
 	if (head->cmd.type != WORD)
-		return (word_split(head->left, symbol, type)
-			&& word_split(head->right, symbol, type));
-	curr = find_unescaped(head->cmd.str, symbol);
+		return (split_redirects(head->left)
+			&& split_redirects(head->right));
+	curr = find_redirect(head->cmd.str, &head->cmd.type);
 	if (!curr)
 		return (true);
+	*curr = '\0';
+	curr++;
+	if (head->cmd.type == HEREDOC || head->cmd.type == APPEND)
+		curr++;
 	if (!split_unevenly(head->cmd.str, curr, &head->left, &head->right))
-		return (ft_putstr_fd("split node failed\n", 2), false);
-	free(head->cmd.str);
-	head->cmd.str = ft_strdup(symbol);
-	//TODO CHECK FAILED
-	head->cmd.type = type;
-	return (word_split(head->left, symbol, type)
-		&& word_split(head->right, symbol, type));
+		return (ft_putstr_fd("split redirects failed\n", 2), false);
+	free_null((void **)&head->cmd.str);
+	return (split_redirects(head->left) && split_redirects(head->right));
 }
 
 t_tree	*construct_ast(char *str)
@@ -91,11 +88,9 @@ t_tree	*construct_ast(char *str)
 	head = create_node(str);
 	if (!head)
 		return (NULL);
-	if (!rec_split(head, "|", PIPE))
-		return (ft_putstr_fd("rec split failed\n", 2), free_tree(head), NULL);
-	if (!word_split(head, "<", INPUT))
-		return (ft_putstr_fd("rec split failed\n", 2), free_tree(head), NULL);
-	if (!word_split(head, ">", OUTPUT))
-		return (ft_putstr_fd("rec split failed\n", 2), free_tree(head), NULL);
+	if (!split_pipes(head))
+		return (ft_putstr_fd("split pipes failed\n", 2), free_tree(head), NULL);
+	if (!split_redirects(head))
+		return (ft_putstr_fd("split redirects failed\n", 2), free_tree(head), NULL);
 	return (head);
 }
