@@ -13,11 +13,12 @@
 
 typedef struct s_context
 {
-	int		input;
-	int		output;
-	char	*cmd;
-	char	**args;
-	int		error;
+	int					input;
+	int					output;
+	char				*cmd;
+	char				**args;
+	int					error;
+	struct s_context	*next;
 }	t_context;
 
 typedef enum e_type
@@ -65,6 +66,7 @@ bool	handle_word(t_tree *node, char **env, t_context *context);
 
 char	*get_path(char *cmd, char **env);
 void	reset_context(t_context *context);
+void	clear_context_list(t_context *context);
 void	set_context(t_context *context);
 
 void	free_strs(char **strs);

@@ -6,7 +6,11 @@ bool	handle_input(t_tree *node, char **env, t_context *context)
 	context->input = open(node->right->cmd.str, O_RDONLY);
 	if (context->input == -1)
 	{
-		ft_putstr_fd("file error\n", 2);
+		ft_putstr_fd(node->right->cmd.str, 2);
+		if (errno == EACCES)
+			ft_putstr_fd(": Permission denied\n", 2);
+		else
+			ft_putstr_fd(": No such file or directory\n", 2);
 		context->error = 1;
 		return (false);
 	}
@@ -16,10 +20,14 @@ bool	handle_input(t_tree *node, char **env, t_context *context)
 bool	handle_output(t_tree *node, char **env, t_context *context)
 {
 	close(context->output);
-	context->output = open(node->right->cmd.str, O_WRONLY | O_CREAT, 0644);
+	context->output = open(node->right->cmd.str, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (context->output == -1)
 	{
-		ft_putstr_fd("file error\n", 2);
+		ft_putstr_fd(node->right->cmd.str, 2);
+		if (errno == EACCES)
+			ft_putstr_fd(": Permission denied\n", 2);
+		else
+			ft_putstr_fd(": No such file or directory\n", 2);
 		context->error = 1;
 		return (false);
 	}
@@ -28,28 +36,22 @@ bool	handle_output(t_tree *node, char **env, t_context *context)
 
 bool	handle_pipe(t_tree *node, char **env, t_context *context)
 {
-	pid_t	pid;
-	int		fds[2];
+	int	fds[2];
 
-	pipe(fds);
-	context->output = fds[1];
-	traverse_tree(node->left, env, context);
-	pid = fork();
-	if (pid == -1)
+	if (pipe(fds) == -1)
 	{
-		close(fds[0]); 
-		close(fds[1]);
+		ft_putstr_fd("An error has occurred\n", 2);
+		context->error = 1;
 		return (false);
 	}
-	if (pid == 0)
-	{
-		close(fds[0]);
-		execute_cmd(context, env);
-	}
-	close(fds[1]);
-	reset_context(context);
-	context->input = fds[0];
-	return (traverse_tree(node->right, env, context));
+	close(context->output);
+	context->output = fds[1];
+	traverse_tree(node->left, env, context);
+	context->next = malloc(sizeof(t_context));
+	set_context(context->next);
+	close(context->next->input);
+	context->next->input = fds[0];
+	return (traverse_tree(node->right, env, context->next));
 }
 
 bool	handle_word(t_tree *node, char **env, t_context *context)

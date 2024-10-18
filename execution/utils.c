@@ -7,6 +7,7 @@ void	set_context(t_context *context)
 	context->input = -1;
 	context->output = -1;
 	context->error = 0;
+	context->next = NULL;
 }
 
 void	reset_context(t_context *context)
@@ -20,6 +21,19 @@ void	reset_context(t_context *context)
 	close(context->output);
 	context->output = -1;
 	context->error = 0;
+}
+
+void	clear_context_list(t_context *context)
+{
+	t_context	*next;
+
+	while (context)
+	{
+		next = context->next;
+		reset_context(context);
+		free(context);
+		context = next;
+	}
 }
 
 char	*get_path(char *cmd, char **env)

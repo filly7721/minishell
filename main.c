@@ -51,5 +51,4 @@ int	main(int ac, char **av, char **env)
 	ast = construct_ast(str);
 	print_tree(ast, 0);
 	printf("exit status is %d\n", execute(ast, env));
-	free_tree(ast);
 }
