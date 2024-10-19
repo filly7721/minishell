@@ -10,7 +10,7 @@ void	set_context(t_context *context)
 	context->next = NULL;
 }
 
-void	reset_context(t_context *context)
+void	free_context(t_context *context)
 {
 	free_strs(context->args);
 	context->args = NULL;
@@ -21,6 +21,7 @@ void	reset_context(t_context *context)
 	close(context->output);
 	context->output = -1;
 	context->error = 0;
+	free(context);
 }
 
 void	clear_context_list(t_context *context)
@@ -30,8 +31,7 @@ void	clear_context_list(t_context *context)
 	while (context)
 	{
 		next = context->next;
-		reset_context(context);
-		free(context);
+		free_context(context);
 		context = next;
 	}
 }

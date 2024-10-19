@@ -60,12 +60,13 @@ bool	traverse_tree(t_tree *node, char **env, t_context *context);
 void	execute_cmd(t_context *context, char **env);
 
 bool	handle_input(t_tree *node, char **env, t_context *context);
-bool	handle_output(t_tree *node, char **env, t_context *context);
+bool	handle_output(t_tree *node, char **env, t_context *context, bool append);
 bool	handle_pipe(t_tree *node, char **env, t_context *context);
 bool	handle_word(t_tree *node, char **env, t_context *context);
+bool	handle_heredoc(t_tree *node, char **env, t_context *context);
 
 char	*get_path(char *cmd, char **env);
-void	reset_context(t_context *context);
+void	free_context(t_context *context);
 void	clear_context_list(t_context *context);
 void	set_context(t_context *context);
 

@@ -19,18 +19,18 @@ void	execute_cmd(t_context *context, char **env)
 	if (context->error)
 	{
 		status = context->error;
-		reset_context(context);
-		free(context);
+		free_context(context);
 		exit(status);
 	}
 	if (context->input != -1)
 		(dup2(context->input, 0), close(context->input));
 	if (context->output != -1)
 		(dup2(context->output, 1), close(context->output));
+	if (!context->args[0])
+		(free_context(context), exit(0));
 	execve(context->cmd, context->args, env);
 	status = get_execution_error(context->args[0]);
-	reset_context(context);
-	free(context);
+	free_context(context);
 	exit(status);
 }
 
@@ -40,10 +40,14 @@ bool	traverse_tree(t_tree *node, char **env, t_context *context)
 		return (handle_pipe(node, env, context));
 	else if (node->cmd.type == WORD)
 		return (handle_word(node, env, context));
+	else if (node->cmd.type == HEREDOC)
+		return (handle_heredoc(node, env, context));
 	else if (node->cmd.type == INPUT)
 		return (handle_input(node, env, context));
+	else if (node->cmd.type == APPEND)
+		return (handle_output(node, env, context, true));
 	else if (node->cmd.type == OUTPUT)
-		return (handle_output(node, env, context));
+		return (handle_output(node, env, context, false));
 	else
 		ft_putstr_fd("unknown type in tree\n", 2);
 	return (false);
@@ -61,8 +65,7 @@ bool	execute_context(t_context *context, char **env, pid_t *pid)
 			return (clear_context_list(context), ft_putstr_fd("an error has occurered\n", 2), false);
 		if (*pid == 0)
 			execute_cmd(context, env);
-		reset_context(context);
-		free(context);
+		free_context(context);
 		context = next;
 	}
 	return (true);

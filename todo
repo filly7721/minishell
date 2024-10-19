@@ -1,5 +1,3 @@
-free all functions in child after he fails (classic... )
-print "No such file or directory" if execve fails if there is a slash in the cmd
 check that ft_strdup(symbol) doesnt fail in tree traversal
 implement word rules in get_word();
 make backslash inside quotes powerless
