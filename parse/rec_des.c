@@ -91,6 +91,7 @@ t_tree	*construct_ast(char *str)
 	if (!split_pipes(head))
 		return (ft_putstr_fd("split pipes failed\n", 2), free_tree(head), NULL);
 	if (!split_redirects(head))
-		return (ft_putstr_fd("split redirects failed\n", 2), free_tree(head), NULL);
+		return (ft_putstr_fd("split redirects failed\n", 2),
+			free_tree(head), NULL);
 	return (head);
 }

@@ -4,7 +4,7 @@ int	get_execution_error(char *cmd)
 {
 	ft_putstr_fd(cmd, 2);
 	if (errno == EACCES)
-		return	(ft_putstr_fd(": Permission denied\n", 2), 126);
+		return (ft_putstr_fd(": Permission denied\n", 2), 126);
 	if (ft_strchr(cmd, '/') != NULL)
 		ft_putstr_fd(": No such file or directory\n", 2);
 	ft_putstr_fd(": Command not found\n", 2);
@@ -14,7 +14,7 @@ int	get_execution_error(char *cmd)
 void	execute_cmd(t_context *context, char **env)
 {
 	int	status;
-	
+
 	clear_context_list(context->next);
 	if (context->error)
 	{
@@ -56,13 +56,14 @@ bool	traverse_tree(t_tree *node, char **env, t_context *context)
 bool	execute_context(t_context *context, char **env, pid_t *pid)
 {
 	t_context	*next;
-	
+
 	while (context)
 	{
 		next = context->next;
 		*pid = fork();
 		if (*pid == -1)
-			return (clear_context_list(context), ft_putstr_fd("an error has occurered\n", 2), false);
+			return (clear_context_list(context),
+				ft_putstr_fd("an error has occurered\n", 2), false);
 		if (*pid == 0)
 			execute_cmd(context, env);
 		free_context(context);
