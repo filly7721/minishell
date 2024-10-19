@@ -1,3 +1,2 @@
 check that ft_strdup(symbol) doesnt fail in tree traversal
 implement word rules in get_word();
-make backslash inside quotes powerless
