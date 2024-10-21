@@ -55,6 +55,8 @@ bool	split_unevenly(char *str, char *curr, t_tree **left, t_tree **right);
 char	*get_word(char *str);
 char	*find_redirect(char *str, t_type *type);
 
+char	*find_and_expand(char *str, char **env);
+
 int		execute(t_tree *node, char **env);
 bool	traverse_tree(t_tree *node, char **env, t_context *context);
 int		execute_cmd(t_context *context, char **env);

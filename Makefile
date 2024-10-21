@@ -2,7 +2,7 @@ PARSE_SRCS	=	utils.c rec_des.c
 
 EXEC_SRCS	=	execution.c utils.c handler.c heredoc.c builtins.c 
 
-SRCS		=	utils.c main.c ${addprefix parse/, ${PARSE_SRCS}} ${addprefix execution/, ${EXEC_SRCS}}
+SRCS		=	utils.c main.c cleanup.c ${addprefix parse/, ${PARSE_SRCS}} ${addprefix execution/, ${EXEC_SRCS}}
 
 OBJS		=	${SRCS:.c=.o}
 
