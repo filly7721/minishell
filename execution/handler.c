@@ -1,10 +1,20 @@
 #include "minishell.h"
 
+bool	find_heredoc(t_tree *node)
+{
+	if (node->cmd.type == HEREDOC)
+		return (true);
+	if (node->cmd.type == WORD)
+		return (false);
+	return (find_heredoc(node->left));
+}
+
 bool	handle_input(t_tree *node, char **env, t_context *context)
 {
-	close(context->input);
-	context->input = open(node->right->cmd.str, O_RDONLY);
-	if (context->input == -1)
+	int	fd;
+
+	fd = open(node->right->cmd.str, O_RDONLY);
+	if (fd == -1)
 	{
 		ft_putstr_fd(node->right->cmd.str, 2);
 		if (errno == EACCES)
@@ -14,30 +24,13 @@ bool	handle_input(t_tree *node, char **env, t_context *context)
 		context->error = 1;
 		return (false);
 	}
-	return (traverse_tree(node->left, env, context));
-}
-
-bool	handle_heredoc(t_tree *node, char **env, t_context *context)
-{
-	int		fds[2];
-	char	*str;
-
-	if (pipe(fds) == -1)
+	if (find_heredoc(node->left))
+		close(fd);
+	else
 	{
-		ft_putstr_fd("An error has occurred\n", 2);
-		context->error = 1;
-		return (false);
+		close(context->input);
+		context->input = fd;
 	}
-	str = readline("heredoc> ");
-	while (str && ft_strncmp(str, node->right->cmd.str, -1) != 0)
-	{
-		ft_putendl_fd(str, fds[1]);
-		free(str);
-		str = readline("heredoc> ");
-	}
-	close(context->input);
-	context->input = fds[0];
-	close(fds[1]);
 	return (traverse_tree(node->left, env, context));
 }
 
@@ -74,10 +67,13 @@ bool	handle_pipe(t_tree *node, char **env, t_context *context)
 	close(context->output);
 	context->output = fds[1];
 	traverse_tree(node->left, env, context);
-	context->next = malloc(sizeof(t_context));
-	set_context(context->next);
-	close(context->next->input);
-	context->next->input = fds[0];
+	if (context->next->input != -1)
+	{
+		close(context->next->input);
+		context->next->input = fds[0];
+	}
+	else
+		close(fds[0]);
 	return (traverse_tree(node->right, env, context->next));
 }
 

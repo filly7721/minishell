@@ -1,6 +1,6 @@
 PARSE_SRCS	=	utils.c rec_des.c
 
-EXEC_SRCS	=	execution.c utils.c handler.c
+EXEC_SRCS	=	execution.c utils.c handler.c heredoc.c
 
 SRCS		=	utils.c main.c ${addprefix parse/, ${PARSE_SRCS}} ${addprefix execution/, ${EXEC_SRCS}}
 

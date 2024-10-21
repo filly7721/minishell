@@ -41,7 +41,7 @@ bool	traverse_tree(t_tree *node, char **env, t_context *context)
 	else if (node->cmd.type == WORD)
 		return (handle_word(node, env, context));
 	else if (node->cmd.type == HEREDOC)
-		return (handle_heredoc(node, env, context));
+		return (traverse_tree(node->left, env, context));
 	else if (node->cmd.type == INPUT)
 		return (handle_input(node, env, context));
 	else if (node->cmd.type == APPEND)
@@ -82,6 +82,7 @@ int	execute(t_tree *head, char **env)
 	if (!context)
 		return (ft_putstr_fd("An error has occurred: ", 2), 1);
 	set_context(context);
+	premature_visitation(head, context);
 	traverse_tree(head, env, context);
 	free_tree(head);
 	if (!execute_context(context, env, &pid))
