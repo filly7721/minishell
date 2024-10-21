@@ -57,7 +57,10 @@ char	*find_redirect(char *str, t_type *type);
 
 int		execute(t_tree *node, char **env);
 bool	traverse_tree(t_tree *node, char **env, t_context *context);
-void	execute_cmd(t_context *context, char **env);
+int		execute_cmd(t_context *context, char **env);
+
+int		execute_builtin(t_context *context, char **env);
+bool	is_builtin(char *str);
 
 void	handle_heredoc(t_tree *node, t_context *context);
 void	premature_visitation(t_tree *node, t_context *context);

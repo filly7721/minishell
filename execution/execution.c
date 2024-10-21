@@ -11,7 +11,7 @@ int	get_execution_error(char *cmd)
 	return (127);
 }
 
-void	execute_cmd(t_context *context, char **env)
+int	execute_cmd(t_context *context, char **env)
 {
 	int	status;
 
@@ -20,7 +20,7 @@ void	execute_cmd(t_context *context, char **env)
 	{
 		status = context->error;
 		free_context(context);
-		exit(status);
+		return (status);
 	}
 	if (context->input != -1)
 		(dup2(context->input, 0), close(context->input));
@@ -31,7 +31,7 @@ void	execute_cmd(t_context *context, char **env)
 	execve(context->cmd, context->args, env);
 	status = get_execution_error(context->args[0]);
 	free_context(context);
-	exit(status);
+	return (status);
 }
 
 bool	traverse_tree(t_tree *node, char **env, t_context *context)
@@ -65,7 +65,11 @@ bool	execute_context(t_context *context, char **env, pid_t *pid)
 			return (clear_context_list(context),
 				ft_putstr_fd("an error has occurered\n", 2), false);
 		if (*pid == 0)
-			execute_cmd(context, env);
+		{
+			if (is_builtin(context->cmd))
+				exit(execute_builtin(context, env));
+			exit(execute_cmd(context, env));
+		}
 		free_context(context);
 		context = next;
 	}
@@ -85,6 +89,8 @@ int	execute(t_tree *head, char **env)
 	premature_visitation(head, context);
 	traverse_tree(head, env, context);
 	free_tree(head);
+	if (context->next == NULL && is_builtin(context->cmd))
+		return (execute_builtin(context, env));
 	if (!execute_context(context, env, &pid))
 		return (ft_putstr_fd("An error has occurred: ", 2), 1);
 	waitpid(pid, &status, 0);

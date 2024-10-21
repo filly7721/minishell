@@ -1,2 +1,8 @@
 check that ft_strdup(symbol) doesnt fail in tree traversal
 implement word rules in get_word();
+	BUILTSINS
+cd with only a relative or absolute path
+export with no options
+unset with no options
+env with no options or arguments
+exit with no options

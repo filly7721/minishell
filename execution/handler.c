@@ -87,6 +87,11 @@ bool	handle_word(t_tree *node, char **env, t_context *context)
 		return (false);
 	}
 	if (context->args[0])
-		context->cmd = get_path(context->args[0], env);
+	{
+		if (is_builtin(context->args[0]))
+			context->cmd = ft_strdup(context->args[0]);
+		else
+			context->cmd = get_path(context->args[0], env);
+	}
 	return (true);
 }
