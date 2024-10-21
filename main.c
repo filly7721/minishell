@@ -37,6 +37,18 @@ void	print_tree(t_tree *head, int depth)
 	print_tree(head->left, depth + 1);
 }
 
+bool	cleanup(t_tree *node)
+{
+	char	*tmp;
+
+	if (node->cmd.type != WORD)
+		return (cleanup(node->left) && cleanup(node->right));
+	tmp =  node->cmd.str;
+	node->cmd.str =	ft_strtrim(node->cmd.str, " ");
+	free(tmp);
+	return (node->cmd.str != NULL);
+}
+
 int	main(int ac, char **av, char **env)
 {
 	char	*str;
@@ -49,6 +61,10 @@ int	main(int ac, char **av, char **env)
 	if (!str)
 		return (1);
 	ast = construct_ast(str);
+	if (!ast)
+		return (1);
+	if (!cleanup(ast))
+		return (ft_putstr_fd("Cleanup failed\n", 2), 1);
 	print_tree(ast, 0);
 	printf("exit status is %d\n", execute(ast, env));
 }
