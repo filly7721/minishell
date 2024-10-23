@@ -3,29 +3,38 @@
 int	ft_echo(t_context *context)
 {
 	char	**strs;
-	
+	int		fd;
+
+	fd = context->output;
+	if (fd == -1)
+		fd = 1;
 	strs = context->args + 1;
 	if (ft_strncmp(context->args[1], "-n", -1) == 0)
 		strs++;
-	ft_putstr_fd(*strs++, context->output);
+	ft_putstr_fd(*strs++, fd);
 	while (*strs)
 	{
-		ft_putchar_fd(' ', context->output);
-		ft_putstr_fd(*strs++, context->output);
+		ft_putchar_fd(' ', fd);
+		ft_putstr_fd(*strs++, fd);
 	}
 	if (ft_strncmp(context->args[1], "-n", -1) == 0)
-		ft_putchar_fd(' ', context->output);
+		ft_putchar_fd(' ', fd);
 	return (0);
 }
 
 int	ft_pwd(t_context *context, char **env)
 {
-	while (*env && ft_strncmp("pwd=", *env, 4) != 0)
+	int	fd;
+
+	fd = context->output;
+	if (fd == -1)
+		fd = 1;
+	while (*env && ft_strncmp("PWD=", *env, 4) != 0)
 		env++;
 	if (*env == NULL)
-		ft_putendl_fd("", context->output);
+		ft_putendl_fd("", fd);
 	else
-		ft_putendl_fd(*env + 4, context->output);
+		ft_putendl_fd(*env + 4, fd);
 	return (0);
 }
 
