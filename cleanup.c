@@ -46,23 +46,27 @@ char	*expanded_str(char *str, char *var, char **env)
 	return (lstr);
 }
 
-char	*find_and_expand(char *str, char **env)
+bool	expand_tree(t_tree *node, char **env)
 {
 	int	i;
 
+	if (node->cmd.type == HEREDOC)
+		return (expand_tree(node->left, env));
+	if (node->cmd.type != WORD)
+		return (expand_tree(node->left, env) && expand_tree(node->right, env));
 	i = 0;
-	while (str[i])
+	while (node->cmd.str[i])
 	{
-		if (str[i] == '$')
+		if (node->cmd.str[i] == '$')
 		{
-			str[i] = '\0';
+			node->cmd.str[i] = '\0';
 			i++;
-			str = expanded_str(str, &str[i] , env);
-			if (str == NULL)
-				return (NULL);
+			node->cmd.str = expanded_str(node->cmd.str, &node->cmd.str[i] , env);
+			if (node->cmd.str == NULL)
+				return (false);
 			continue ;
 		}
 		i++;
 	}
-	return (str);
+	return (true);
 }

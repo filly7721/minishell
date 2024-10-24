@@ -47,6 +47,14 @@ typedef struct s_tree
 	struct s_tree	*right;
 }	t_tree;
 
+typedef struct s_shell
+{
+	t_list		*env;
+	int			status;
+	t_tree		*tree;
+	t_context	*context;
+}	t_shell;
+
 t_tree	*construct_ast(char *str);
 char	*find_unescaped(char *str, char *symbol);
 t_tree	*create_node(char *str);
@@ -55,7 +63,7 @@ bool	split_unevenly(char *str, char *curr, t_tree **left, t_tree **right);
 char	*get_word(char *str);
 char	*find_redirect(char *str, t_type *type);
 
-char	*find_and_expand(char *str, char **env);
+bool	expand_tree(t_tree *node, char **env);
 
 int		execute(t_tree *node, char **env);
 bool	traverse_tree(t_tree *node, char **env, t_context *context);

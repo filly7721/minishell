@@ -37,15 +37,12 @@ void	print_tree(t_tree *head, int depth)
 	print_tree(head->left, depth + 1);
 }
 
-bool	cleanup(t_tree *node, char **env)
+bool	trim_tree(t_tree *node, char **env)
 {
 	char	*tmp;
 
 	if (node->cmd.type != WORD)
-		return (cleanup(node->left, env) && cleanup(node->right, env));
-	node->cmd.str = find_and_expand(node->cmd.str, env);
-	if (node->cmd.str == NULL)
-		return (false);
+		return (trim_tree(node->left, env) && trim_tree(node->right, env));
 	tmp =  node->cmd.str;
 	node->cmd.str =	ft_strtrim(node->cmd.str, " ");
 	free(tmp);
@@ -55,7 +52,7 @@ bool	cleanup(t_tree *node, char **env)
 int	main(int ac, char **av, char **env)
 {
 	char	*str;
-	t_tree	*ast;
+	t_shell	shell;
 
 	(void)ac;
 	(void)av;
@@ -63,11 +60,12 @@ int	main(int ac, char **av, char **env)
 	str = readline("megashell> ");
 	if (!str)
 		return (1);
-	ast = construct_ast(str);
-	if (!ast)
+	shell.tree = construct_ast(str);
+	if (!shell.tree)
 		return (1);
-	if (!cleanup(ast, env))
+	if (!expand_tree(shell.tree, env) || !trim_tree(shell.tree, env))
+		//TODO FREE
 		return (ft_putstr_fd("Cleanup failed\n", 2), 1);
-	print_tree(ast, 0);
-	printf("exit status is %d\n", execute(ast, env));
+	print_tree(shell.tree, 0);
+	printf("exit status is %d\n", execute(shell.tree, env));
 }
