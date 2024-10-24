@@ -17,8 +17,8 @@ int	ft_echo(t_context *context)
 		ft_putchar_fd(' ', fd);
 		ft_putstr_fd(*strs++, fd);
 	}
-	if (ft_strncmp(context->args[1], "-n", -1) == 0)
-		ft_putchar_fd(' ', fd);
+	if (ft_strncmp(context->args[1], "-n", -1) != 0)
+		ft_putchar_fd('\n', fd);
 	return (0);
 }
 
@@ -43,7 +43,7 @@ int	execute_builtin(t_context *context, char **env)
 	int	status;
 
 	clear_context_list(context->next);
-	ft_putstr_fd("eyo builtin time\n", 2);
+	// ft_putstr_fd("eyo builtin time\n", 2);
 	if (ft_strncmp(context->cmd, "echo", -1) == 0)
 		status = ft_echo(context);
 	else if (ft_strncmp(context->cmd, "pwd", -1) == 0)
