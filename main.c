@@ -63,7 +63,8 @@ int	main(int ac, char **av, char **env)
 	shell.tree = construct_ast(str);
 	if (!shell.tree)
 		return (1);
-	if (!expand_tree(shell.tree, env) || !trim_tree(shell.tree, env))
+	if (!expand_tree(shell.tree, env) || !trim_tree(shell.tree, env)
+		|| !removing_quotes(shell.tree, env))
 		//TODO FREE
 		return (ft_putstr_fd("Cleanup failed\n", 2), 1);
 	print_tree(shell.tree, 0);

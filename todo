@@ -6,6 +6,7 @@ unset with no options
 env with no options or arguments
 exit with no options
 
+handle single quotes in expansion
 
 fix pipes \
 testcase:

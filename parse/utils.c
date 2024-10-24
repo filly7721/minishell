@@ -7,9 +7,9 @@ char	*find_unescaped(char *str, char *symbol)
 		if (*str == '\\')
 			str++;
 		else if (*str == '"')
-			str = strrchr(str + 1, '"');
+			str = ft_strchr(str + 1, '"');
 		else if (*str == '\'')
-			str = strrchr(str + 1, '\'');
+			str = ft_strchr(str + 1, '\'');
 		else if (ft_strncmp(str, symbol, ft_strlen(symbol)) == 0)
 			return (str);
 		str++;
@@ -68,9 +68,9 @@ char	*find_redirect(char *str, t_type *type)
 		if (*str == '\\')
 			str++;
 		else if (*str == '"')
-			str = strrchr(str + 1, '"');
+			str = ft_strchr(str + 1, '"');
 		else if (*str == '\'')
-			str = strrchr(str + 1, '\'');
+			str = ft_strchr(str + 1, '\'');
 		else if (ft_strncmp(str, "<<", 2) == 0)
 			return (*type = HEREDOC, str);
 		else if (ft_strncmp(str, ">>", 2) == 0)
