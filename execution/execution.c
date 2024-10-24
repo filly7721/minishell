@@ -37,7 +37,8 @@ int	execute_cmd(t_context *context, char **env)
 bool	traverse_tree(t_tree *node, char **env, t_context *context)
 {
 	if (node->cmd.type == PIPE)
-		return (handle_pipe(node, env, context));
+		return (traverse_tree(node->left, env, context)
+			&& traverse_tree(node->right, env, context->next));
 	else if (node->cmd.type == WORD)
 		return (handle_word(node, env, context));
 	else if (node->cmd.type == HEREDOC)

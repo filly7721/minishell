@@ -72,13 +72,13 @@ int		execute_cmd(t_context *context, char **env);
 int		execute_builtin(t_context *context, char **env);
 bool	is_builtin(char *str);
 
-void	handle_heredoc(t_tree *node, t_context *context);
-void	premature_visitation(t_tree *node, t_context *context);
+bool	handle_pipe(t_tree *node, t_context *context);
+bool	handle_heredoc(t_tree *node, t_context *context);
+bool	premature_visitation(t_tree *node, t_context *context);
 
 bool	handle_input(t_tree *node, char **env, t_context *context);
 bool	handle_output(t_tree *node, char **env, t_context *context,
 	bool append);
-bool	handle_pipe(t_tree *node, char **env, t_context *context);
 bool	handle_word(t_tree *node, char **env, t_context *context);
 
 char	*get_path(char *cmd, char **env);
