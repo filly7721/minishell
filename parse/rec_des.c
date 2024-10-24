@@ -53,8 +53,7 @@ bool	split_pipes(t_tree *head)
 		return (true);
 	if (!split_evenly(head->cmd.str, curr, &head->left, &head->right))
 		return (ft_putstr_fd("split pipe failed\n", 2), false);
-	free(head->cmd.str);
-	head->cmd.str = ft_strdup("|");
+	free_null((void **)&head->cmd.str);
 	head->cmd.type = PIPE;
 	return (split_pipes(head->left) && split_pipes(head->right));
 }
