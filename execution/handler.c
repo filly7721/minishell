@@ -54,29 +54,6 @@ bool	handle_output(t_tree *node, char **env, t_context *context, bool append)
 	return (traverse_tree(node->left, env, context));
 }
 
-bool	handle_pipe(t_tree *node, char **env, t_context *context)
-{
-	int	fds[2];
-
-	if (pipe(fds) == -1)
-	{
-		ft_putstr_fd("An error has occurred\n", 2);
-		context->error = 1;
-		return (false);
-	}
-	close(context->output);
-	context->output = fds[1];
-	traverse_tree(node->left, env, context);
-	if (context->next->input != -1)
-	{
-		close(context->next->input);
-		context->next->input = fds[0];
-	}
-	else
-		close(fds[0]);
-	return (traverse_tree(node->right, env, context->next));
-}
-
 bool	handle_word(t_tree *node, char **env, t_context *context)
 {
 	context->args = ft_split(node->cmd.str, ' ');
