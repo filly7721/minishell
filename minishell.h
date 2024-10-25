@@ -90,6 +90,7 @@ void	free_strs(char **strs);
 char	*ft_strappend(char *str1, char *str2);
 void	free_null(void **ptr);
 void	free_tree(t_tree *head);
+char	**quote_split(char *str, char c);
 
 bool	removing_quotes(t_tree *node, char **env);
 
