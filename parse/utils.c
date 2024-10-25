@@ -72,13 +72,15 @@ char	*find_redirect(char *str, t_type *type)
 		else if (*str == '\'')
 			str = ft_strchr(str + 1, '\'');
 		else if (ft_strncmp(str, "<<", 2) == 0)
-			return (*type = HEREDOC, str);
+			*type = HEREDOC;
 		else if (ft_strncmp(str, ">>", 2) == 0)
-			return (*type = APPEND, str);
+			*type = APPEND;
 		else if (ft_strncmp(str, "<", 1) == 0)
-			return (*type = INPUT, str);
+			*type = INPUT;
 		else if (ft_strncmp(str, ">", 1) == 0)
-			return (*type = OUTPUT, str);
+			*type = OUTPUT;
+		if (*type != WORD)
+			return (str);
 		str++;
 	}
 	return (NULL);
