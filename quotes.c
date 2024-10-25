@@ -26,7 +26,7 @@ bool	removing_quotes(t_tree *node, char **env)
 
 	i = 0;
 	if (node->cmd.type != WORD)
-		return (expand_tree(node->left, env) && expand_tree(node->right, env));
+		return (removing_quotes(node->left, env) && removing_quotes(node->right, env));
 	while (node->cmd.str[i])
 	{
 		end = NULL;
