@@ -56,7 +56,8 @@ int	main(int ac, char **av, char **env)
 
 	(void)ac;
 	(void)av;
-	(void)env;
+	if (!init_shell(&shell, env))
+		return (1);
 	str = readline("megashell> ");
 	if (!str)
 		return (1);
@@ -67,5 +68,6 @@ int	main(int ac, char **av, char **env)
 		//TODO FREE
 		return (ft_putstr_fd("Cleanup failed\n", 2), 1);
 	print_tree(shell.tree, 0);
-	printf("exit status is %d\n", execute(shell.tree, env));
+	printf("exit status is %d\n", execute(&shell));
+	clear_shell(&shell);
 }

@@ -50,7 +50,6 @@ typedef struct s_tree
 typedef struct s_shell
 {
 	t_list		*env;
-	int			status;
 	t_tree		*tree;
 	t_context	*context;
 }	t_shell;
@@ -65,11 +64,11 @@ char	*find_redirect(char *str, t_type *type);
 
 bool	expand_tree(t_tree *node, char **env);
 
-int		execute(t_tree *node, char **env);
+int		execute(t_shell *shell);
 bool	traverse_tree(t_tree *node, char **env, t_context *context);
 int		execute_cmd(t_context *context, char **env);
 
-int		execute_builtin(t_context *context, char **env);
+int		execute_builtin(t_shell *context, char **env);
 bool	is_builtin(char *str);
 
 bool	handle_pipe(t_tree *node, t_context *context);
@@ -90,5 +89,9 @@ void	free_strs(char **strs);
 char	*ft_strappend(char *str1, char *str2);
 void	free_null(void **ptr);
 void	free_tree(t_tree *head);
+
+void	clear_shell(t_shell *shell);
+bool	init_shell(t_shell *shell, char **env);
+char	**export_env(t_shell *shell);
 
 #endif
