@@ -47,6 +47,7 @@ t_tree	*create_node(char *str)
 	node->left = NULL;
 	node->right = NULL;
 	node->cmd.str = str;
+	node->cmd.strs = NULL;
 	node->cmd.type = WORD;
 	return (node);
 }
@@ -58,6 +59,7 @@ void	free_tree(t_tree *head)
 	free_tree(head->left);
 	free_tree(head->right);
 	free(head->cmd.str);
+	free_strs(head->cmd.strs);
 	free(head);
 }
 

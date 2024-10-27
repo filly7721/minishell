@@ -27,7 +27,8 @@ char	*get_type(t_type type)
 
 void	print_tree(t_tree *head, int depth)
 {
-	int	i;
+	int		i;
+	char	**strs;
 
 	if (!head)
 		return ;
@@ -35,7 +36,16 @@ void	print_tree(t_tree *head, int depth)
 	i = 0;
 	while (i++ < depth)
 		printf("\t");
-	printf("(%s:%s)\n", get_type(head->cmd.type), head->cmd.str);
+	if (head->cmd.type == WORD)
+	{
+		printf("[");
+		strs = head->cmd.strs;
+		while (*strs)
+			printf("%s, ", *strs++);
+		printf("]\n");
+	}
+	else
+		printf("(%s:%s)\n", get_type(head->cmd.type), head->cmd.str);
 	print_tree(head->left, depth + 1);
 }
 

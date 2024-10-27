@@ -74,7 +74,7 @@ bool	expand_tree(t_tree *node, char **env)
 			node->cmd.str[i] = '\0';
 			i++;
 			node->cmd.str
-				= expanded_str(node->cmd.str, &node->cmd.str[i], env);
+				= expanded_str(node->cmd.str, &node->cmd.str[i--], env);
 			if (node->cmd.str == NULL)
 				return (false);
 			continue ;
@@ -106,38 +106,27 @@ char	*snip_snip(char *str, int *i, char *end)
 bool	removing_quotes(t_tree *node, char **env)
 {
 	int		i;
-	char	*end;
+	char	**strs;
 
-	i = 0;
 	if (node->cmd.type != WORD)
 		return (removing_quotes(node->left, env)
 			&& removing_quotes(node->right, env));
-	while (node->cmd.str[i])
+	strs = node->cmd.strs;
+	while (*strs)
 	{
-		end = NULL;
-		if (node->cmd.str[i] == '\\')
+		i = 0;
+		while ((*strs)[i])
+		{
+			if ((*strs)[i] == '\\')
+				i++;
+			else if ((*strs)[i] == '"' || (*strs)[i] == '\'')
+				(*strs) = snip_snip((*strs), &i,
+						ft_strchr(&((*strs)[i + 1]), (*strs)[i]));
+			if ((*strs) == NULL)
+				return (false);
 			i++;
-		else if (node->cmd.str[i] == '"')
-			end = ft_strchr(&node->cmd.str[i + 1], '"');
-		else if (node->cmd.str[i] == '\'')
-			end = ft_strchr(&node->cmd.str[i + 1], '\'');
-		if (end)
-			node->cmd.str = snip_snip(node->cmd.str, &i, end);
-		if (node->cmd.str == NULL)
-			return (false);
-		i++;
+		}
+		strs++;
 	}
 	return (true);
-}
-
-bool	trim_tree(t_tree *node, char **env)
-{
-	char	*tmp;
-
-	if (node->cmd.type != WORD)
-		return (trim_tree(node->left, env) && trim_tree(node->right, env));
-	tmp = node->cmd.str;
-	node->cmd.str = ft_strtrim(node->cmd.str, " ");
-	free(tmp);
-	return (node->cmd.str != NULL);
 }

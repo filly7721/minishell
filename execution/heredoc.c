@@ -12,7 +12,7 @@ bool	handle_heredoc(t_tree *node, t_context *context)
 		return (false);
 	}
 	str = readline("heredoc> ");
-	while (str && ft_strncmp(str, node->right->cmd.str, -1) != 0)
+	while (str && ft_strncmp(str, node->right->cmd.strs[0], -1) != 0)
 	{
 		ft_putendl_fd(str, fds[1]);
 		free(str);

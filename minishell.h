@@ -37,6 +37,7 @@ typedef enum e_type
 
 typedef struct s_cmd
 {
+	char	**strs;
 	char	*str;
 	t_type	type;
 }	t_cmd;

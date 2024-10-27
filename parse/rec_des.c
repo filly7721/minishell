@@ -80,6 +80,16 @@ bool	split_redirects(t_tree *head)
 	return (split_redirects(head->left));
 }
 
+bool	split_args(t_tree *node)
+{
+	if (node->cmd.type != WORD)
+		return (split_args(node->left) && split_args(node->right));
+	node->cmd.strs = quote_split(node->cmd.str, ' ');
+	if (!node->cmd.strs)
+		return (false);
+	return (true);
+}
+
 t_tree	*construct_ast(char *str, char **env)
 {
 	t_tree	*head;
@@ -92,8 +102,11 @@ t_tree	*construct_ast(char *str, char **env)
 	if (!split_redirects(head))
 		return (ft_putstr_fd("split redirects failed\n", 2),
 			free_tree(head), NULL);
-	if (!expand_tree(head, env) || !trim_tree(head, env)
-		|| !removing_quotes(head, env))
+	if (!expand_tree(head, env))
+		return (ft_putstr_fd("Tree cleanup failed\n", 2), free_tree(head), NULL);
+	if (!split_args(head))
+		return (ft_putstr_fd("Tree cleanup failed\n", 2), free_tree(head), NULL);
+	if (!removing_quotes(head, env))
 		return (ft_putstr_fd("Tree cleanup failed\n", 2), free_tree(head), NULL);
 	return (head);
 }

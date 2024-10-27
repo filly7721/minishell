@@ -54,6 +54,7 @@ int	execute_builtin(t_shell *shell, char **env)
 		status = 1;
 	}
 	free_context(shell->context);
+	shell->context = NULL;
 	free_strs(env);
 	return (status);
 }
