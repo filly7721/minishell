@@ -43,12 +43,11 @@ int	execute_builtin(t_shell *shell, char **env)
 	int	status;
 
 	clear_context_list(shell->context->next);
-	// ft_putstr_fd("eyo builtin time\n", 2);
 	if (ft_strncmp(shell->context->cmd, "echo", -1) == 0)
 		status = ft_echo(shell->context);
 	else if (ft_strncmp(shell->context->cmd, "pwd", -1) == 0)
 		status = ft_pwd(shell->context, env);
-	else 
+	else
 	{
 		ft_putstr_fd("unhandled builtin", 2);
 		status = 1;

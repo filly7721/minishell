@@ -30,7 +30,6 @@ bool	init_shell(t_shell *shell, char **env)
 	shell->context = NULL;
 	shell->env = NULL;
 	shell->tree = NULL;
-
 	while (*env)
 	{
 		str = ft_strdup(*env);

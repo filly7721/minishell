@@ -73,7 +73,7 @@ bool	execute_context(t_shell *shell, char **env, pid_t *pid)
 			if (is_builtin(shell->context->cmd))
 				status = execute_builtin(shell, env);
 			else
-			status = execute_cmd(shell->context, env);
+				status = execute_cmd(shell->context, env);
 			ft_lstclear(&shell->env, free);
 			exit(status);
 		}

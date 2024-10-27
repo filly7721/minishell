@@ -1,8 +1,8 @@
 #include "minishell.h"
 
-t_context	*create_context()
+t_context	*create_context(void)
 {
-	t_context *context;
+	t_context	*context;
 
 	context = malloc(sizeof(t_context));
 	if (!context)

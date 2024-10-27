@@ -43,8 +43,8 @@ bool	trim_tree(t_tree *node, char **env)
 
 	if (node->cmd.type != WORD)
 		return (trim_tree(node->left, env) && trim_tree(node->right, env));
-	tmp =  node->cmd.str;
-	node->cmd.str =	ft_strtrim(node->cmd.str, " ");
+	tmp = node->cmd.str;
+	node->cmd.str = ft_strtrim(node->cmd.str, " ");
 	free(tmp);
 	return (node->cmd.str != NULL);
 }
