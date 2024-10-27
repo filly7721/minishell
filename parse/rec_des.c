@@ -77,7 +77,7 @@ bool	split_redirects(t_tree *head)
 	if (!split_unevenly(head->cmd.str, curr, &head->left, &head->right))
 		return (ft_putstr_fd("split redirects failed\n", 2), false);
 	free_null((void **)&head->cmd.str);
-	return (split_redirects(head->left) && split_redirects(head->right));
+	return (split_redirects(head->left));
 }
 
 t_tree	*construct_ast(char *str)

@@ -1,4 +1,6 @@
 implement word rules in get_word();
+if string is empty do nothing
+
 	BUILTSINS
 cd with only a relative or absolute path
 export with no options

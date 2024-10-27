@@ -95,7 +95,7 @@ char		**quote_split(char *str, char c);
 bool		removing_quotes(t_tree *node, char **env);
 
 void		clear_shell(t_shell *shell);
-bool		init_shell(t_shell *shell, char **env);
+t_shell		*create_shell(char **env);
 char		**export_env(t_shell *shell);
 
 #endif

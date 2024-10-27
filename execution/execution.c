@@ -16,6 +16,7 @@ int	execute_cmd(t_context *context, char **env)
 	int	status;
 
 	clear_context_list(context->next);
+	context->next = NULL;
 	if (context->error)
 	{
 		status = context->error;
@@ -31,7 +32,6 @@ int	execute_cmd(t_context *context, char **env)
 	if (context->cmd)
 		execve(context->cmd, context->args, env);
 	status = get_execution_error(context->args[0]);
-	free_context(context);
 	free_strs(env);
 	return (status);
 }
@@ -74,7 +74,7 @@ bool	execute_context(t_shell *shell, char **env, pid_t *pid)
 				status = execute_builtin(shell, env);
 			else
 				status = execute_cmd(shell->context, env);
-			ft_lstclear(&shell->env, free);
+			clear_shell(shell);
 			exit(status);
 		}
 		free_context(shell->context);
