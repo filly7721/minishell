@@ -1,6 +1,5 @@
 implement word rules in get_word();
 if string is empty do nothing
-echo with no args segfaults
 ignore empty strings
 
 	BUILTSINS

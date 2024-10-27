@@ -9,15 +9,16 @@ int	ft_echo(t_context *context)
 	if (fd == -1)
 		fd = 1;
 	strs = context->args + 1;
-	if (ft_strncmp(context->args[1], "-n", -1) == 0)
+	if (context->args[1] && ft_strncmp(context->args[1], "-n", -1) == 0)
 		strs++;
-	ft_putstr_fd(*strs++, fd);
+	if (*strs)
+		ft_putstr_fd(*strs++, fd);
 	while (*strs)
 	{
 		ft_putchar_fd(' ', fd);
 		ft_putstr_fd(*strs++, fd);
 	}
-	if (ft_strncmp(context->args[1], "-n", -1) != 0)
+	if (!context->args[1] || ft_strncmp(context->args[1], "-n", -1) != 0)
 		ft_putchar_fd('\n', fd);
 	return (0);
 }
