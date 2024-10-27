@@ -20,7 +20,7 @@ int	execute_cmd(t_context *context, char **env)
 	if (context->error)
 	{
 		status = context->error;
-		free_context(context);
+		free_strs(env);
 		return (status);
 	}
 	if (context->input != -1)
@@ -28,7 +28,7 @@ int	execute_cmd(t_context *context, char **env)
 	if (context->output != -1)
 		(dup2(context->output, 1), close(context->output));
 	if (!context->args[0])
-		(free_context(context), exit(0));
+		return (free_strs(env), 0);
 	if (context->cmd)
 		execve(context->cmd, context->args, env);
 	status = get_execution_error(context->args[0]);
@@ -83,16 +83,14 @@ bool	execute_context(t_shell *shell, char **env, pid_t *pid)
 	return (true);
 }
 
-int	execute(t_shell *shell)
+int	execute(t_shell *shell, char **env)
 {
 	pid_t		pid;
 	int			status;
-	char		**env;
-
-	env = export_env(shell);
+	
 	shell->context = create_context();
 	if (!shell->context)
-		return (free(env), ft_putstr_fd("An error has occurred: ", 2), 1);
+		return (ft_putstr_fd("An error has occurred: ", 2), 1);
 	premature_visitation(shell->tree, shell->context);
 	traverse_tree(shell->tree, env, shell->context);
 	free_tree(shell->tree);

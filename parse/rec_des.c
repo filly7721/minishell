@@ -80,7 +80,7 @@ bool	split_redirects(t_tree *head)
 	return (split_redirects(head->left));
 }
 
-t_tree	*construct_ast(char *str)
+t_tree	*construct_ast(char *str, char **env)
 {
 	t_tree	*head;
 
@@ -92,5 +92,8 @@ t_tree	*construct_ast(char *str)
 	if (!split_redirects(head))
 		return (ft_putstr_fd("split redirects failed\n", 2),
 			free_tree(head), NULL);
+	if (!expand_tree(head, env) || !trim_tree(head, env)
+		|| !removing_quotes(head, env))
+		return (ft_putstr_fd("Tree cleanup failed\n", 2), free_tree(head), NULL);
 	return (head);
 }

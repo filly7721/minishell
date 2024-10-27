@@ -1,5 +1,7 @@
 #include "minishell.h"
 
+int	g_status = 0;
+
 char	*get_type(t_type type)
 {
 	if (type == SLASH)
@@ -37,22 +39,11 @@ void	print_tree(t_tree *head, int depth)
 	print_tree(head->left, depth + 1);
 }
 
-bool	trim_tree(t_tree *node, char **env)
-{
-	char	*tmp;
-
-	if (node->cmd.type != WORD)
-		return (trim_tree(node->left, env) && trim_tree(node->right, env));
-	tmp = node->cmd.str;
-	node->cmd.str = ft_strtrim(node->cmd.str, " ");
-	free(tmp);
-	return (node->cmd.str != NULL);
-}
-
 int	main(int ac, char **av, char **env)
 {
 	char	*str;
 	t_shell	*shell;
+	char	**new_env;
 
 	(void)ac;
 	(void)av;
@@ -61,18 +52,19 @@ int	main(int ac, char **av, char **env)
 		return (1);
 	while (1)
 	{
+		new_env = export_env(shell);
+		if (!new_env)
+			return (clear_shell(shell), ft_putstr_fd("env failed`\n", 2), 1);
 		str = readline("megashell> ");
 		if (!str)
 			break ;
-		shell->tree = construct_ast(str);
+		shell->tree = construct_ast(str, new_env);
 		if (!shell->tree)
-			return (clear_shell(shell), 1);
-		if (!expand_tree(shell->tree, env) || !trim_tree(shell->tree, env)
-			|| !removing_quotes(shell->tree, env))
-			//TODO FREE
-			return (ft_putstr_fd("Cleanup failed\n", 2), 1);
+			return (clear_shell(shell), ft_putstr_fd("Ast failed`\n", 2), 1);
 		print_tree(shell->tree, 0);
-		printf("exit status is %d\n", execute(shell));
+		g_status = execute(shell, new_env);
 	}
+	free_strs(new_env);
 	clear_shell(shell);
+	return (g_status);
 }

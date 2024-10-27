@@ -11,6 +11,7 @@
 # include <sys/wait.h>
 # include <errno.h>
 
+extern int	g_status;
 typedef struct s_context
 {
 	int					input;
@@ -54,7 +55,7 @@ typedef struct s_shell
 	t_context	*context;
 }	t_shell;
 
-t_tree		*construct_ast(char *str);
+t_tree		*construct_ast(char *str, char **env);
 char		*find_unescaped(char *str, char *symbol);
 t_tree		*create_node(char *str);
 bool		split_evenly(char *str, char *curr, t_tree **left, t_tree **right);
@@ -65,7 +66,7 @@ char		*find_redirect(char *str, t_type *type);
 
 bool		expand_tree(t_tree *node, char **env);
 
-int			execute(t_shell *shell);
+int			execute(t_shell *shell, char **env);
 bool		traverse_tree(t_tree *node, char **env, t_context *context);
 int			execute_cmd(t_context *context, char **env);
 
@@ -92,6 +93,7 @@ void		free_null(void **ptr);
 void		free_tree(t_tree *head);
 char		**quote_split(char *str, char c);
 
+bool		trim_tree(t_tree *node, char **env);
 bool		removing_quotes(t_tree *node, char **env);
 
 void		clear_shell(t_shell *shell);

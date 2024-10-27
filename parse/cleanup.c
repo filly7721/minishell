@@ -6,6 +6,8 @@ char	*get_env_value(char *name, char **env)
 	char	*find;
 
 	i = 0;
+	if (strncmp(name, "?", 2) == 0)
+		return (ft_itoa(g_status));
 	find = ft_strjoin(name, "=");
 	if (find == NULL)
 		return (NULL);
@@ -17,6 +19,22 @@ char	*get_env_value(char *name, char **env)
 	return (ft_strdup(env[i] + ft_strlen(name) + 1));
 }
 
+char	*get_var_name(char *str)
+{
+	char	*word;
+
+	word = str;
+	if (*str == '?')
+		return (ft_strdup("?"));
+	while (*word == '_' || ft_isalnum(*word))
+		word++;
+	if (word == str)
+		word = ft_strdup("");
+	else
+		word = ft_substr(str, 0, word - str);
+	return (word);
+}
+
 char	*expanded_str(char *str, char *var, char **env)
 {
 	char	*word;
@@ -24,13 +42,7 @@ char	*expanded_str(char *str, char *var, char **env)
 	char	*rstr;
 	char	*mstr;	
 
-	word = var;
-	while (*word == '_' || ft_isalnum(*word))
-		word++;
-	if (word == var)
-		word = ft_strdup("");
-	else
-		word = ft_substr(var, 0, word - var);
+	word = get_var_name(var);
 	if (word == NULL)
 		return (free(str), NULL);
 	lstr = ft_strdup(str);
@@ -116,4 +128,16 @@ bool	removing_quotes(t_tree *node, char **env)
 		i++;
 	}
 	return (true);
+}
+
+bool	trim_tree(t_tree *node, char **env)
+{
+	char	*tmp;
+
+	if (node->cmd.type != WORD)
+		return (trim_tree(node->left, env) && trim_tree(node->right, env));
+	tmp = node->cmd.str;
+	node->cmd.str = ft_strtrim(node->cmd.str, " ");
+	free(tmp);
+	return (node->cmd.str != NULL);
 }
