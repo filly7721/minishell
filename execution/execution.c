@@ -90,10 +90,9 @@ int	execute(t_shell *shell)
 	char		**env;
 
 	env = export_env(shell);
-	shell->context = malloc(sizeof(t_context));
+	shell->context = create_context();
 	if (!shell->context)
 		return (free(env), ft_putstr_fd("An error has occurred: ", 2), 1);
-	set_context(shell->context);
 	premature_visitation(shell->tree, shell->context);
 	traverse_tree(shell->tree, env, shell->context);
 	free_tree(shell->tree);

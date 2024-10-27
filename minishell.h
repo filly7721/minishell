@@ -80,10 +80,10 @@ bool	handle_output(t_tree *node, char **env, t_context *context,
 	bool append);
 bool	handle_word(t_tree *node, char **env, t_context *context);
 
-char	*get_path(char *cmd, char **env);
-void	free_context(t_context *context);
-void	clear_context_list(t_context *context);
-void	set_context(t_context *context);
+char		*get_path(char *cmd, char **env);
+void		free_context(t_context *context);
+void		clear_context_list(t_context *context);
+t_context	*create_context();
 
 void	free_strs(char **strs);
 char	*ft_strappend(char *str1, char *str2);

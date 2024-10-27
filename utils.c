@@ -53,7 +53,6 @@ int	count_words(char *str, char c)
 char	*extract_word(char *str, char c)
 {
 	char	*curr;
-	int		i;
 	
 	curr = str;
 	while (*curr != '\0' && *curr != c)

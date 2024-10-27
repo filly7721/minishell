@@ -34,7 +34,7 @@ bool	handle_pipe(t_tree *node, t_context *context)
 		context->error = 1;
 		return (false);
 	}
-	context->next = malloc(sizeof(t_context));
+	context->next =	create_context();
 	if (!context->next)
 	{
 		close(fds[0]);
@@ -43,7 +43,6 @@ bool	handle_pipe(t_tree *node, t_context *context)
 		context->error = 1;
 		return (false);
 	}
-	set_context(context->next);
 	context->output = fds[1];
 	context->next->input = fds[0];
 	return (premature_visitation(node->right, context->next));

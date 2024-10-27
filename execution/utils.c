@@ -1,13 +1,19 @@
 #include "minishell.h"
 
-void	set_context(t_context *context)
+t_context	*create_context()
 {
+	t_context *context;
+
+	context = malloc(sizeof(t_context));
+	if (!context)
+		return (NULL);
 	context->args = NULL;
 	context->cmd = NULL;
 	context->input = -1;
 	context->output = -1;
 	context->error = 0;
 	context->next = NULL;
+	return (context);
 }
 
 void	free_context(t_context *context)
