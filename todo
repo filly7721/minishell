@@ -1,4 +1,5 @@
 implement word rules in get_word();
+modify shlvl at program start
 if string is empty do nothing
 ignore empty strings
 
@@ -10,3 +11,4 @@ env with no options or arguments
 exit with no options
 
 handle single quotes in expansion
+pwd builtin shouldnt rely on env

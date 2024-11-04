@@ -98,7 +98,7 @@ int	execute(t_shell *shell, char **env)
 	if (shell->context->next == NULL && is_builtin(shell->context->cmd))
 		return (execute_builtin(shell, env));
 	if (!execute_context(shell, env, &pid))
-		return (ft_putstr_fd("An error has occurred: ", 2), 1);
+		return (ft_putstr_fd("An error has occurred: ", 2), free_strs(env), 1);
 	free_strs(env);
 	waitpid(pid, &status, 0);
 	while (wait(NULL) != -1)

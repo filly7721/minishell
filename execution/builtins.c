@@ -25,17 +25,27 @@ int	ft_echo(t_context *context)
 
 int	ft_pwd(t_context *context, char **env)
 {
-	int	fd;
+	int		fd;
+	char	*buff;
+	size_t	size;
 
+	(void)env;
 	fd = context->output;
 	if (fd == -1)
 		fd = 1;
-	while (*env && ft_strncmp("PWD=", *env, 4) != 0)
-		env++;
-	if (*env == NULL)
-		ft_putendl_fd("", fd);
-	else
-		ft_putendl_fd(*env + 4, fd);
+	size = 32;
+	while (1)
+	{
+		buff = malloc(size);
+		if (!buff)
+			return (ft_putstr_fd("An error has occured\n", 2), 1);
+		if (getcwd(buff, size) != NULL)
+			break ;
+		free(buff);
+		size *= 2;
+	}
+	ft_putendl_fd(buff, 2);
+	free(buff);
 	return (0);
 }
 
