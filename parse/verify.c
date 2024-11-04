@@ -28,7 +28,7 @@ char	*validate_redirections(char *str)
 			break ;
 		str++;
 	}
-	return (str);
+	return (str - 1);
 }
 
 /// @brief a therapist
@@ -47,7 +47,7 @@ char	*validate_pipe(char *str)
 	}
 	if (*str == '|' || *str == '\0')
 		return (NULL);
-	return (str);
+	return (str - 1);
 }
 
 /// @brief a therapist
@@ -62,12 +62,12 @@ bool	validate_string(char *str)
 		else if (*str == '\'' || *str == '"')
 			str = ft_strchr(str + 1, *str);
 		else if (*str == '<' || *str == '>')
-			str = validate_redirections(str) - 1;
+			str = validate_redirections(str);
 		else if (*str == '|')
-			str = validate_pipe(str) - 1;
-		if (str == NULL || str == NULL - 1)
+			str = validate_pipe(str);
+		if (str == NULL)
 			return (false);
 		str++;
 	}
-	return true;
+	return (true);
 }

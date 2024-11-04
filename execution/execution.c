@@ -41,10 +41,10 @@ bool	traverse_tree(t_tree *node, char **env, t_context *context)
 	if (node->cmd.type == PIPE)
 		return (traverse_tree(node->left, env, context)
 			&& traverse_tree(node->right, env, context->next));
-	else if (node->cmd.type == WORD)
-		return (handle_word(node, env, context));
 	else if (node->cmd.type == HEREDOC)
 		return (traverse_tree(node->left, env, context));
+	else if (node->cmd.type == WORD)
+		return (handle_word(node, env, context));
 	else if (node->cmd.type == INPUT)
 		return (handle_input(node, env, context));
 	else if (node->cmd.type == APPEND)
