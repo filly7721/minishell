@@ -63,7 +63,7 @@ bool	validate_string(char *str)
 			str = ft_strchr(str + 1, *str);
 		else if (*str == '<' || *str == '>')
 			str = validate_redirections(str) - 1;
-		if (*str == '|')
+		else if (*str == '|')
 			str = validate_pipe(str) - 1;
 		if (str == NULL || str == NULL - 1)
 			return (false);

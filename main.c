@@ -49,6 +49,22 @@ void	print_tree(t_tree *head, int depth)
 	print_tree(head->left, depth + 1);
 }
 
+char	*get_input(void)
+{
+	char	*str;
+	
+	while (1)
+	{
+		str = readline("megashell> ");
+		if (!str)
+			return (NULL);
+		if (validate_string(str))
+			return (str); // TODO add history
+		ft_putstr_fd("parse error\n", 2);
+		free(str);
+	}
+}
+
 int	main(int ac, char **av, char **env)
 {
 	char	*str;
@@ -65,7 +81,7 @@ int	main(int ac, char **av, char **env)
 		new_env = export_env(shell);
 		if (!new_env)
 			return (clear_shell(shell), ft_putstr_fd("env failed`\n", 2), 1);
-		str = readline("megashell> ");
+		str = get_input();
 		if (!str)
 			break ;
 		shell->tree = construct_ast(str, new_env);

@@ -101,4 +101,6 @@ void		clear_shell(t_shell *shell);
 t_shell		*create_shell(char **env);
 char		**export_env(t_shell *shell);
 
+bool		validate_string(char *str);
+
 #endif

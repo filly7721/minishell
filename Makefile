@@ -1,4 +1,4 @@
-PARSE_SRCS	=	utils.c rec_des.c cleanup.c
+PARSE_SRCS	=	utils.c rec_des.c cleanup.c verify.c
 
 EXEC_SRCS	=	execution.c utils.c handler.c heredoc.c builtins.c 
 
