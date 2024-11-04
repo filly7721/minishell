@@ -91,7 +91,7 @@ int	execute(t_shell *shell, char **env)
 	shell->context = create_context();
 	if (!shell->context)
 		return (ft_putstr_fd("An error has occurred: ", 2), 1);
-	premature_visitation(shell->tree, shell->context);
+	premature_visitation(shell->tree, shell->context, env);
 	traverse_tree(shell->tree, env, shell->context);
 	free_tree(shell->tree);
 	shell->tree = NULL;

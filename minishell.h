@@ -74,9 +74,9 @@ int			execute_cmd(t_context *context, char **env);
 int			execute_builtin(t_shell *context, char **env);
 bool		is_builtin(char *str);
 
-bool		handle_pipe(t_tree *node, t_context *context);
-bool		handle_heredoc(t_tree *node, t_context *context);
-bool		premature_visitation(t_tree *node, t_context *context);
+bool		handle_pipe(t_tree *node, t_context *context, char **env);
+bool		handle_heredoc(t_tree *node, t_context *context, char **env);
+bool		premature_visitation(t_tree *node, t_context *context, char **env);
 
 bool		handle_input(t_tree *node, char **env, t_context *context);
 bool		handle_output(t_tree *node, char **env,
@@ -102,5 +102,6 @@ t_shell		*create_shell(char **env);
 char		**export_env(t_shell *shell);
 
 bool		validate_string(char *str);
+char	*expanded_str(char *str, char *var, char **env);
 
 #endif
