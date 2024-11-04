@@ -23,13 +23,12 @@ int	ft_echo(t_context *context)
 	return (0);
 }
 
-int	ft_pwd(t_context *context, char **env)
+int	ft_pwd(t_context *context)
 {
 	int		fd;
 	char	*buff;
 	size_t	size;
 
-	(void)env;
 	fd = context->output;
 	if (fd == -1)
 		fd = 1;
@@ -57,7 +56,7 @@ int	execute_builtin(t_shell *shell, char **env)
 	if (ft_strncmp(shell->context->cmd, "echo", -1) == 0)
 		status = ft_echo(shell->context);
 	else if (ft_strncmp(shell->context->cmd, "pwd", -1) == 0)
-		status = ft_pwd(shell->context, env);
+		status = ft_pwd(shell->context);
 	else
 	{
 		ft_putstr_fd("unhandled builtin", 2);
