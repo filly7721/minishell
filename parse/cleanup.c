@@ -1,13 +1,13 @@
 #include "minishell.h"
 
-char	*get_env_value(char *name, char **env)
+char	*get_env_value(char *name, char **env, t_shell *shell)
 {
 	int		i;
 	char	*find;
 
 	i = 0;
 	if (strncmp(name, "?", 2) == 0)
-		return (ft_itoa(g_status));
+		return (ft_itoa(shell->status));
 	find = ft_strjoin(name, "=");
 	if (find == NULL)
 		return (NULL);
@@ -35,7 +35,7 @@ char	*get_var_name(char *str)
 	return (word);
 }
 
-char	*expanded_str(char *str, char *var, char **env)
+char	*expanded_str(char *str, char *var, char **env, t_shell *shell)
 {
 	char	*word;
 	char	*lstr;
@@ -46,7 +46,7 @@ char	*expanded_str(char *str, char *var, char **env)
 	if (word == NULL)
 		return (free(str), NULL);
 	lstr = ft_strdup(str);
-	mstr = get_env_value(word, env);
+	mstr = get_env_value(word, env, shell);
 	rstr = ft_strdup(var + ft_strlen(word));
 	free(word);
 	free(str);
@@ -58,14 +58,14 @@ char	*expanded_str(char *str, char *var, char **env)
 	return (lstr);
 }
 
-bool	expand_tree(t_tree *node, char **env)
+bool	expand_tree(t_tree *node, char **env, t_shell *shell)
 {
 	int	i;
 
 	if (node->cmd.type == HEREDOC)
-		return (expand_tree(node->left, env));
+		return (expand_tree(node->left, env, shell));
 	if (node->cmd.type != WORD)
-		return (expand_tree(node->left, env) && expand_tree(node->right, env));
+		return (expand_tree(node->left, env, shell) && expand_tree(node->right, env, shell));
 	i = 0;
 	while (node->cmd.str[i])
 	{
@@ -74,7 +74,7 @@ bool	expand_tree(t_tree *node, char **env)
 			node->cmd.str[i] = '\0';
 			i++;
 			node->cmd.str
-				= expanded_str(node->cmd.str, &node->cmd.str[i--], env);
+				= expanded_str(node->cmd.str, &node->cmd.str[i--], env, shell);
 			if (node->cmd.str == NULL)
 				return (false);
 			continue ;

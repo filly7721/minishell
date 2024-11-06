@@ -11,7 +11,6 @@
 # include <sys/wait.h>
 # include <errno.h>
 
-extern int	g_status;
 typedef struct s_context
 {
 	int					input;
@@ -54,9 +53,10 @@ typedef struct s_shell
 	t_list		*env;
 	t_tree		*tree;
 	t_context	*context;
+	int			status;
 }	t_shell;
 
-t_tree		*construct_ast(char *str, char **env);
+t_tree		*construct_ast(char *str, char **env, t_shell *shell);
 char		*find_unescaped(char *str, char *symbol);
 t_tree		*create_node(char *str);
 bool		split_evenly(char *str, char *curr, t_tree **left, t_tree **right);
@@ -65,7 +65,7 @@ bool		split_unevenly(char *str, char *curr, t_tree **left,
 char		*get_word(char *str);
 char		*find_redirect(char *str, t_type *type);
 
-bool		expand_tree(t_tree *node, char **env);
+bool		expand_tree(t_tree *node, char **env, t_shell *shell);
 
 int			execute(t_shell *shell, char **env);
 bool		traverse_tree(t_tree *node, char **env, t_context *context);
@@ -74,9 +74,9 @@ int			execute_cmd(t_context *context, char **env);
 int			execute_builtin(t_shell *context, char **env);
 bool		is_builtin(char *str);
 
-bool		handle_pipe(t_tree *node, t_context *context, char **env);
-bool		handle_heredoc(t_tree *node, t_context *context, char **env);
-bool		premature_visitation(t_tree *node, t_context *context, char **env);
+bool		handle_pipe(t_tree *node, t_context *context, char **env, t_shell *shell);
+bool		handle_heredoc(t_tree *node, t_context *context, char **env, t_shell *shell);
+bool		premature_visitation(t_tree *node, t_context *context, char **env, t_shell *shell);
 
 bool		handle_input(t_tree *node, char **env, t_context *context);
 bool		handle_output(t_tree *node, char **env,
@@ -103,8 +103,8 @@ char		**export_env(t_shell *shell);
 void		remove_from_env(t_list **head, char *name);
 
 bool		validate_string(char *str);
-char		*expanded_str(char *str, char *var, char **env);
-char		*get_env_value(char *name, char **env);
+char		*expanded_str(char *str, char *var, char **env, t_shell *shell);
+char		*get_env_value(char *name, char **env, t_shell *shell);
 
 
 #endif

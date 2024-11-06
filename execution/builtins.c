@@ -1,17 +1,17 @@
 #include "minishell.h"
 
-int	ft_cd(t_context *context, char **env)
+int	ft_cd(t_shell *shell, char **env)
 {
 	char	*directory;
 	
-	if (context->args[1] == NULL)
+	if (shell->context->args[1] == NULL)
 	{
-		directory = get_env_value("HOME", env);
+		directory = get_env_value("HOME", env, shell);
 		if (!directory || directory[0] == '\0')
 			return (free(directory), ft_putstr_fd("cd: HOME not set", 2), 1);
 	}
 	else
-		directory = ft_strdup(context->args[1]);
+		directory = ft_strdup(shell->context->args[1]);
 	if (chdir(directory) == 0)
 		return (free(directory), 0);
 	ft_putstr_fd(directory, 2);
@@ -107,7 +107,7 @@ int	execute_builtin(t_shell *shell, char **env)
 	else if (ft_strncmp(shell->context->cmd, "unset", -1) == 0)
 		status = ft_unset(shell);
 	else if (ft_strncmp(shell->context->cmd, "cd", -1) == 0)
-		status = ft_cd(shell->context, env);
+		status = ft_cd(shell, env);
 	else
 	{
 		ft_putstr_fd("unhandled builtin", 2);
