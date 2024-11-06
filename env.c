@@ -56,3 +56,20 @@ void	clear_shell(t_shell *shell)
 	free_tree(shell->tree);
 	free(shell);
 }
+
+void	remove_from_env(t_list **head, char *name)
+{
+	t_list	*tmp;
+	
+	if (*head == NULL)
+		return ;
+	if (ft_strncmp((*head)->content, name, ft_strlen(name)) == 0)
+	{
+		tmp = (*head)->next;
+		ft_lstdelone(*head, free);
+		*head = tmp;
+		remove_from_env(head, name);
+		return ;
+	}
+	remove_from_env(&((*head)->next), name);
+}

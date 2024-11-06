@@ -48,6 +48,24 @@ int	ft_pwd(t_context *context)
 	return (0);
 }
 
+int	ft_unset(t_shell *shell)
+{
+	int		i;
+	char	*name;
+
+	i = 1;
+	while (shell->context->args[i])
+	{
+		name = ft_strjoin(shell->context->args[i], "=");
+		if (!name)
+			return (ft_putstr_fd("An error has occured\n", 2), 1);
+		remove_from_env(&shell->env, name);
+		free(name);
+		i++;
+	}
+	return (0);
+}
+
 int	execute_builtin(t_shell *shell, char **env)
 {
 	int	status;
@@ -57,6 +75,8 @@ int	execute_builtin(t_shell *shell, char **env)
 		status = ft_echo(shell->context);
 	else if (ft_strncmp(shell->context->cmd, "pwd", -1) == 0)
 		status = ft_pwd(shell->context);
+	else if (ft_strncmp(shell->context->cmd, "unset", -1) == 0)
+		status = ft_unset(shell);
 	else
 	{
 		ft_putstr_fd("unhandled builtin", 2);
@@ -75,6 +95,8 @@ bool	is_builtin(char *str)
 	if (ft_strncmp(str, "echo", -1) == 0)
 		return (true);
 	else if (ft_strncmp(str, "pwd", -1) == 0)
+		return (true);
+	else if (ft_strncmp(str, "unset", -1) == 0)
 		return (true);
 	return (false);
 }

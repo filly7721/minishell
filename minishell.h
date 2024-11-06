@@ -100,6 +100,7 @@ bool		removing_quotes(t_tree *node, char **env);
 void		clear_shell(t_shell *shell);
 t_shell		*create_shell(char **env);
 char		**export_env(t_shell *shell);
+void		remove_from_env(t_list **head, char *name);
 
 bool		validate_string(char *str);
 char	*expanded_str(char *str, char *var, char **env);
