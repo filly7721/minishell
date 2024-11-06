@@ -103,6 +103,8 @@ char		**export_env(t_shell *shell);
 void		remove_from_env(t_list **head, char *name);
 
 bool		validate_string(char *str);
-char	*expanded_str(char *str, char *var, char **env);
+char		*expanded_str(char *str, char *var, char **env);
+char		*get_env_value(char *name, char **env);
+
 
 #endif
