@@ -57,6 +57,8 @@ typedef struct s_shell
 	int			status;
 }	t_shell;
 
+bool		add_history(char *str);
+
 t_tree		*construct_ast(char *str, char **env, t_shell *shell);
 char		*find_unescaped(char *str, char *symbol);
 t_tree		*create_node(char *str);

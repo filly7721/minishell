@@ -95,6 +95,7 @@ int	main(int ac, char **av, char **env)
 		if (!new_env)
 			return (clear_shell(shell), ft_putstr_fd("env failed`\n", 2), 1);
 		str = get_input();
+		add_history(str);
 		if (!str)
 			break ;
 		if (g_sig != 0)
