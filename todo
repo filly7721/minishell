@@ -12,3 +12,4 @@ exit with no options
 
 handle single quotes in expansion
 pwd builtin shouldnt rely on env
+ask about _ in env

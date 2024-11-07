@@ -1,5 +1,17 @@
 #include "minishell.h"
 
+int	ft_env(t_shell *shell, char **env)
+{
+	int		fd;
+
+	fd = shell->context->output;
+	if (fd == -1)
+		fd = 1;
+	while (*env)
+		ft_putendl_fd(*env++, fd);
+	return (0);
+}
+
 int	ft_cd(t_shell *shell, char **env)
 {
 	char	*directory;
@@ -108,6 +120,8 @@ int	execute_builtin(t_shell *shell, char **env)
 		status = ft_unset(shell);
 	else if (ft_strncmp(shell->context->cmd, "cd", -1) == 0)
 		status = ft_cd(shell, env);
+	else if (ft_strncmp(shell->context->cmd, "env", -1) == 0)
+		status = ft_env(shell, env);
 	else
 	{
 		ft_putstr_fd("unhandled builtin", 2);
@@ -130,6 +144,8 @@ bool	is_builtin(char *str)
 	else if (ft_strncmp(str, "unset", -1) == 0)
 		return (true);
 	else if (ft_strncmp(str, "cd", -1) == 0)
+		return (true);
+	else if (ft_strncmp(str, "env", -1) == 0)
 		return (true);
 	return (false);
 }
