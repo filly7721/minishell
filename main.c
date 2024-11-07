@@ -97,6 +97,11 @@ int	main(int ac, char **av, char **env)
 		str = get_input();
 		if (!str)
 			break ;
+		if (g_sig != 0)
+		{
+			g_sig = 0;
+			shell->status = 1;
+		}
 		shell->tree = construct_ast(str, new_env, shell);
 		if (!shell->tree)
 			return (clear_shell(shell), ft_putstr_fd("Ast failed`\n", 2), 1);
