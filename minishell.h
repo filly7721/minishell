@@ -11,6 +11,7 @@
 # include <sys/wait.h>
 # include <errno.h>
 
+extern int	g_sig;
 typedef struct s_context
 {
 	int					input;

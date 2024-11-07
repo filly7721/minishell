@@ -1,5 +1,7 @@
 #include "minishell.h"
 
+int	g_sig = 0;
+
 char	*get_type(t_type type)
 {
 	if (type == SLASH)
@@ -63,6 +65,18 @@ char	*get_input(void)
 	}
 }
 
+void onsignint(int signum)
+{
+	g_sig = signum;
+	if (signum == SIGINT)
+	{
+		write(1, "\n", 1);
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
+	}
+}
+
 int	main(int ac, char **av, char **env)
 {
 	char	*str;
@@ -74,6 +88,7 @@ int	main(int ac, char **av, char **env)
 	shell = create_shell(env);
 	if (!shell)
 		return (1);
+	signal(SIGINT, onsignint);
 	while (1)
 	{
 		new_env = export_env(shell);
