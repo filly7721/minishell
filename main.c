@@ -88,9 +88,10 @@ int	main(int ac, char **av, char **env)
 	shell = create_shell(env);
 	if (!shell)
 		return (1);
-	signal(SIGINT, onsignint);
 	while (1)
 	{
+		signal(SIGINT, onsignint);
+		signal(SIGQUIT, SIG_IGN);
 		new_env = export_env(shell);
 		if (!new_env)
 			return (clear_shell(shell), ft_putstr_fd("env failed`\n", 2), 1);

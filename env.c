@@ -51,7 +51,7 @@ t_shell	*create_shell(char **env)
 
 void	clear_shell(t_shell *shell)
 {
-	clear_context_list(shell->context);
+	clear_context_list(&shell->context);
 	ft_lstclear(&shell->env, free);
 	free_tree(shell->tree);
 	free(shell);

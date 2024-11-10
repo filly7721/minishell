@@ -30,16 +30,19 @@ void	free_context(t_context *context)
 	free(context);
 }
 
-void	clear_context_list(t_context *context)
+void	clear_context_list(t_context **context)
 {
 	t_context	*next;
+	t_context	*curr;
 
-	while (context)
+	curr = *context;
+	while (curr)
 	{
-		next = context->next;
-		free_context(context);
-		context = next;
+		next = curr->next;
+		free_context(curr);
+		curr = next;
 	}
+	*context = NULL;
 }
 
 char	*get_path(char *cmd, char **env)

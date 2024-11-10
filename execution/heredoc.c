@@ -42,7 +42,7 @@ bool	handle_heredoc(t_tree *node, t_context *context, char **env, t_shell *shell
 	close(context->input);
 	context->input = fds[0];
 	close(fds[1]);
-	return (true);
+	return (str != NULL);
 }
 
 bool	handle_pipe(t_tree *node, t_context *context, char **env, t_shell *shell)

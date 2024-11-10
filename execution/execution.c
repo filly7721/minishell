@@ -15,8 +15,7 @@ int	execute_cmd(t_context *context, char **env)
 {
 	int	status;
 
-	clear_context_list(context->next);
-	context->next = NULL;
+	clear_context_list(&context->next);
 	if (context->error)
 	{
 		status = context->error;
@@ -66,10 +65,12 @@ bool	execute_context(t_shell *shell, char **env, pid_t *pid)
 		next = shell->context->next;
 		*pid = fork();
 		if (*pid == -1)
-			return (clear_context_list(shell->context), free_strs(env),
+			return (clear_context_list(&shell->context), free_strs(env),
 				ft_putstr_fd("an error has occurered\n", 2), false);
 		if (*pid == 0)
 		{
+			signal(SIGINT, SIG_DFL);
+			signal(SIGQUIT, SIG_DFL);
 			if (is_builtin(shell->context->cmd))
 				status = execute_builtin(shell, env);
 			else
@@ -91,10 +92,12 @@ int	execute(t_shell *shell, char **env)
 	shell->context = create_context();
 	if (!shell->context)
 		return (ft_putstr_fd("An error has occurred: ", 2), 1);
-	premature_visitation(shell->tree, shell->context, env);
+	if (premature_visitation(shell->tree, shell->context, env, shell) == false)
+		return (clear_context_list(&shell->context), free_strs(env), 0);
 	traverse_tree(shell->tree, env, shell->context);
 	free_tree(shell->tree);
 	shell->tree = NULL;
+	signal(SIGINT, SIG_IGN);
 	if (shell->context->next == NULL && is_builtin(shell->context->cmd))
 		return (execute_builtin(shell, env));
 	if (!execute_context(shell, env, &pid))
