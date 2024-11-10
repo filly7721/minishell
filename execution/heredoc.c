@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-char	*find_and_expand(char *str, char **env)
+char	*find_and_expand(char *str, char **env, t_shell *shell)
 {
 	int	i;
 	
@@ -10,7 +10,7 @@ char	*find_and_expand(char *str, char **env)
 		if (str[i] == '$')
 		{
 			str[i++] = '\0';
-			str = expanded_str(str, str + i--, env);
+			str = expanded_str(str, str + i--, env, shell);
 			if (!str)
 				return (NULL);
 			continue ;
@@ -20,7 +20,7 @@ char	*find_and_expand(char *str, char **env)
 	return (str);
 }
 
-bool	handle_heredoc(t_tree *node, t_context *context, char **env)
+bool	handle_heredoc(t_tree *node, t_context *context, char **env, t_shell *shell)
 {
 	int		fds[2];
 	char	*str;
@@ -34,7 +34,7 @@ bool	handle_heredoc(t_tree *node, t_context *context, char **env)
 	str = readline("heredoc> ");
 	while (str && ft_strncmp(str, node->right->cmd.strs[0], -1) != 0)
 	{
-		str = find_and_expand(str, env);
+		str = find_and_expand(str, env, shell);
 		ft_putendl_fd(str, fds[1]);
 		free(str);
 		str = readline("heredoc> ");
@@ -45,7 +45,7 @@ bool	handle_heredoc(t_tree *node, t_context *context, char **env)
 	return (true);
 }
 
-bool	handle_pipe(t_tree *node, t_context *context, char **env)
+bool	handle_pipe(t_tree *node, t_context *context, char **env, t_shell *shell)
 {
 	int	fds[2];
 
@@ -66,20 +66,20 @@ bool	handle_pipe(t_tree *node, t_context *context, char **env)
 	}
 	context->output = fds[1];
 	context->next->input = fds[0];
-	return (premature_visitation(node->right, context->next, env));
+	return (premature_visitation(node->right, context->next, env, shell));
 }
 
-bool	premature_visitation(t_tree *node, t_context *context, char **env)
+bool	premature_visitation(t_tree *node, t_context *context, char **env, t_shell *shell)
 {
 	if (node->cmd.type == WORD)
 		return (true);
 	if (node->cmd.type == HEREDOC)
-		if (!handle_heredoc(node, context, env))
+		if (!handle_heredoc(node, context, env, shell))
 			return (false);
-	if (!premature_visitation(node->left, context, env))
+	if (!premature_visitation(node->left, context, env, shell))
 		return (false);
 	if (node->cmd.type == PIPE)
-		if (!handle_pipe(node, context, env))
+		if (!handle_pipe(node, context, env, shell))
 			return (false);
 	return (true);
 }

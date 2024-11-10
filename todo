@@ -19,3 +19,4 @@ pwd builtin shouldnt rely on env
 env_init
 make shlvl do +1
 make empty oldpwd
+ask about _ in env

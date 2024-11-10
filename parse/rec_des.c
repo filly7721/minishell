@@ -90,7 +90,7 @@ bool	split_args(t_tree *node)
 	return (true);
 }
 
-t_tree	*construct_ast(char *str, char **env)
+t_tree	*construct_ast(char *str, char **env, t_shell *shell)
 {
 	t_tree	*head;
 
@@ -102,7 +102,7 @@ t_tree	*construct_ast(char *str, char **env)
 	if (!split_redirects(head))
 		return (ft_putstr_fd("split redirects failed\n", 2),
 			free_tree(head), NULL);
-	if (!expand_tree(head, env))
+	if (!expand_tree(head, env, shell))
 		return (ft_putstr_fd("Tree cleanup failed\n", 2), free_tree(head), NULL);
 	if (!split_args(head))
 		return (ft_putstr_fd("Tree cleanup failed\n", 2), free_tree(head), NULL);

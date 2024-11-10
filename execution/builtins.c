@@ -1,5 +1,46 @@
 #include "minishell.h"
 
+int	ft_env(t_shell *shell, char **env)
+{
+	int		fd;
+
+	fd = shell->context->output;
+	if (fd == -1)
+		fd = 1;
+	while (*env)
+		ft_putendl_fd(*env++, fd);
+	return (0);
+}
+
+int	ft_cd(t_shell *shell, char **env)
+{
+	char	*directory;
+	
+	if (shell->context->args[1] == NULL)
+	{
+		directory = get_env_value("HOME", env, shell);
+		if (!directory || directory[0] == '\0')
+			return (free(directory), ft_putstr_fd("cd: HOME not set", 2), 1);
+	}
+	else
+		directory = ft_strdup(shell->context->args[1]);
+	if (chdir(directory) == 0)
+		return (free(directory), 0);
+	ft_putstr_fd(directory, 2);
+	free(directory);
+	if (errno == ENOTDIR)
+		ft_putstr_fd(": Not a directory\n", 2);
+	else if (errno == EACCES)
+		ft_putstr_fd(": Permission denied\n", 2);
+	else if (errno == ELOOP)
+		ft_putstr_fd(": Too many levels of symbolic links\n", 2);
+	else if (errno == ENAMETOOLONG)
+		ft_putstr_fd(": File name too long\n", 2);
+	else
+		ft_putstr_fd(": No such file or directory\n", 2);
+	return (1);
+}
+
 int	ft_echo(t_context *context)
 {
 	char	**strs;
@@ -178,6 +219,10 @@ int	execute_builtin(t_shell *shell, char **env)
 		status = ft_unset(shell);
 	else if (ft_strncmp(shell->context->cmd, "export", -1) == 0)
 		status = ft_export(shell);
+	else if (ft_strncmp(shell->context->cmd, "cd", -1) == 0)
+		status = ft_cd(shell, env);
+	else if (ft_strncmp(shell->context->cmd, "env", -1) == 0)
+		status = ft_env(shell, env);
 	else
 	{
 		ft_putstr_fd("unhandled builtin", 2);
@@ -200,6 +245,10 @@ bool	is_builtin(char *str)
 	else if (ft_strncmp(str, "unset", -1) == 0)
 		return (true);
 	else if (ft_strncmp(str, "export", -1) == 0)
+		return (true);
+	else if (ft_strncmp(str, "cd", -1) == 0)
+		return (true);
+	else if (ft_strncmp(str, "env", -1) == 0)
 		return (true);
 	return (false);
 }

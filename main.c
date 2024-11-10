@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-int	g_status = 0;
+int	g_sig = 0;
 
 char	*get_type(t_type type)
 {
@@ -65,6 +65,18 @@ char	*get_input(void)
 	}
 }
 
+void onsignint(int signum)
+{
+	g_sig = signum;
+	if (signum == SIGINT)
+	{
+		write(1, "\n", 1);
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
+	}
+}
+
 int	main(int ac, char **av, char **env)
 {
 	char	*str;
@@ -76,21 +88,28 @@ int	main(int ac, char **av, char **env)
 	shell = create_shell(env);
 	if (!shell)
 		return (1);
+	signal(SIGINT, onsignint);
 	while (1)
 	{
 		new_env = export_env(shell);
 		if (!new_env)
 			return (clear_shell(shell), ft_putstr_fd("env failed`\n", 2), 1);
 		str = get_input();
+		add_history(str);
 		if (!str)
 			break ;
-		shell->tree = construct_ast(str, new_env);
+		if (g_sig != 0)
+		{
+			g_sig = 0;
+			shell->status = 1;
+		}
+		shell->tree = construct_ast(str, new_env, shell);
 		if (!shell->tree)
 			return (clear_shell(shell), ft_putstr_fd("Ast failed`\n", 2), 1);
 		print_tree(shell->tree, 0);
-		g_status = execute(shell, new_env);
+		shell->status = execute(shell, new_env);
 	}
 	free_strs(new_env);
 	clear_shell(shell);
-	return (g_status);
+	return (shell->status);
 }
