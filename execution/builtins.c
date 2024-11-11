@@ -1,5 +1,51 @@
 #include "minishell.h"
 
+bool	exit_atoi(char *str, int *num)
+{
+	int	sign;
+	int	i;
+
+	i = 0;
+	sign = 1;
+	*num = 0;
+	while(str[i] == ' ')
+		i++;
+	sign = 1;
+	if (str[i] == '-' || str[i] == '+')
+		if (str[i++] == '-')
+			sign = -1;
+	while (ft_isdigit(str[i]))
+		*num = ((*num) * 10 + str[i++] - '0') % 256;
+	while (str[i] == ' ')
+		i++;
+	if (str[i])
+		return (false);
+	if (sign == -1)
+		*num = 256 - *num;
+	return (true);
+}
+
+int	ft_exit(t_shell *shell, char **env)
+{
+	int	status;
+
+	if (shell->context->args[2])
+		return (ft_putstr_fd("megashell: exit: too many arguments\n", 2), 1);
+	free_strs(env);
+	if (!shell->context->args[1])
+		(clear_shell(shell), ft_putendl_fd("exit", 2), exit(0));
+	if (exit_atoi(shell->context->args[1], &status) == false)
+	{
+		ft_putstr_fd("megashell: ", 2);
+		ft_putstr_fd("exit: ", 2);
+		ft_putstr_fd(shell->context->args[1], 2);
+		ft_putendl_fd(": numeric argument required", 2);
+		status = 255;
+	}
+	clear_shell(shell);
+	exit(status % 256);
+}
+
 int	ft_env(t_shell *shell, char **env)
 {
 	int		fd;
@@ -211,6 +257,7 @@ int	execute_builtin(t_shell *shell, char **env)
 	int	status;
 
 	clear_context_list(&shell->context->next);
+	status = 1;
 	if (ft_strncmp(shell->context->cmd, "echo", -1) == 0)
 		status = ft_echo(shell->context);
 	else if (ft_strncmp(shell->context->cmd, "pwd", -1) == 0)
@@ -223,11 +270,8 @@ int	execute_builtin(t_shell *shell, char **env)
 		status = ft_cd(shell, env);
 	else if (ft_strncmp(shell->context->cmd, "env", -1) == 0)
 		status = ft_env(shell, env);
-	else
-	{
-		ft_putstr_fd("unhandled builtin", 2);
-		status = 1;
-	}
+	else if (ft_strncmp(shell->context->cmd, "exit", -1) == 0)
+		status = ft_exit(shell, env);
 	free_context(shell->context);
 	shell->context = NULL;
 	free_strs(env);
@@ -249,6 +293,8 @@ bool	is_builtin(char *str)
 	else if (ft_strncmp(str, "cd", -1) == 0)
 		return (true);
 	else if (ft_strncmp(str, "env", -1) == 0)
+		return (true);
+	else if (ft_strncmp(str, "exit", -1) == 0)
 		return (true);
 	return (false);
 }
