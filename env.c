@@ -17,7 +17,10 @@ char	**export_env(t_shell *shell)
 		if (!env[i])
 			return (free_strs(env), NULL);
 		curr = curr->next;
-		i++;
+		if (*(ft_strchr(env[i], '=') + 1) == '\0')
+			free_null((void **)&env[i]);
+		else
+			i++;
 	}
 	return (env);
 }

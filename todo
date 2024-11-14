@@ -10,11 +10,11 @@ ignore empty strings
 [x]	env with no options or arguments
 [x]	exit with no options
 
-update old pwd with ft_cd
-ft_env dont print empty envs;
+[x]	update old pwd with ft_cd
+[x]	ft_env dont print empty envs;
 
 handle single quotes in expansion
-pwd builtin shouldnt rely on env
+[x]	pwd builtin shouldnt rely on env
 
 env_init
 make shlvl do +1
