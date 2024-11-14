@@ -25,6 +25,42 @@ bool	exit_atoi(char *str, int *num)
 	return (true);
 }
 
+t_list	*find_lst(t_list *list, char *str, int len)
+{
+	while (list != NULL)
+	{
+		if (ft_strncmp(list->content, str, len) == 0)
+			return (list);
+		list = list->next;
+	}
+	return (NULL);
+}
+
+bool	add_env(t_list **list, char *str)
+{
+	char	*copy;
+	t_list	*temp;
+
+	if (ft_strchr(str, '=') != NULL)
+		copy = ft_strdup(str);
+	else
+		copy = ft_strjoin(str, "=");
+	if (!copy)
+		return (false);
+	temp = find_lst(*list, copy, ft_strchr(copy, '=') - copy);
+	if (temp)
+	{
+		free(temp->content);
+		temp->content = copy;
+		return (true);
+	}
+	temp = ft_lstnew(copy);
+	if (!temp)
+		return (free(copy), false);
+	ft_lstadd_front(list, temp);
+	return (true);
+}
+
 int	ft_exit(t_shell *shell, char **env)
 {
 	int	status;
@@ -210,24 +246,6 @@ int	sort_print(t_list *list, int fd)
 	}
 	print_export(list, fd);
 	return (ft_lstclear(&list, free), 0);
-}
-
-bool	add_env(t_list **list, char *str)
-{
-	char	*copy;
-	t_list	*temp;
-
-	if (ft_strchr(str, '=') != NULL)
-		copy = ft_strdup(str);
-	else
-		copy = ft_strjoin(str, "=");
-	if (!copy)
-		return (ft_putstr_fd("An error has occured\n", 2), 1);
-	temp = ft_lstnew(copy);
-	if (!temp)
-		return (ft_putstr_fd("An error has occured\n", 2), free(copy), 1);
-	ft_lstadd_front(list, temp);
-	return (true);
 }
 
 int	ft_export(t_shell *shell)
