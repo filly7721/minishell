@@ -46,6 +46,7 @@ t_shell	*create_shell(char **env)
 		ft_lstadd_back(&shell->env, node);
 		env++;
 	}
+	shell->status = 0;
 	return (shell);
 }
 
