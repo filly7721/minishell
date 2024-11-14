@@ -94,22 +94,28 @@ int	ft_env(t_shell *shell, char **env)
 	return (0);
 }
 
-int	ft_cd(t_shell *shell, char **env)
+char	*get_pwd()
 {
-	char	*directory;
-	
-	if (shell->context->args[1] == NULL)
+	char	*buff;
+	size_t	size;
+
+	size = 32;
+	while (1)
 	{
-		directory = get_env_value("HOME", env, shell);
-		if (!directory || directory[0] == '\0')
-			return (free(directory), ft_putstr_fd("cd: HOME not set", 2), 1);
+		buff = malloc(size);
+		if (!buff)
+			return (NULL);
+		if (getcwd(buff, size) != NULL)
+			break ;
+		free(buff);
+		size *= 2;
 	}
-	else
-		directory = ft_strdup(shell->context->args[1]);
-	if (chdir(directory) == 0)
-		return (free(directory), 0);
+	return (buff);
+}
+
+void	print_cd_error(char *directory)
+{
 	ft_putstr_fd(directory, 2);
-	free(directory);
 	if (errno == ENOTDIR)
 		ft_putstr_fd(": Not a directory\n", 2);
 	else if (errno == EACCES)
@@ -120,7 +126,54 @@ int	ft_cd(t_shell *shell, char **env)
 		ft_putstr_fd(": File name too long\n", 2);
 	else
 		ft_putstr_fd(": No such file or directory\n", 2);
-	return (1);
+}
+
+bool	update_pwd(t_shell *shell, char *pwd)
+{
+	char	*env_str;
+
+	env_str = ft_strjoin("OLDPWD=", pwd);
+	if (!env_str)
+		return (false);
+	if (!add_env(&shell->env, env_str))
+		return (free(env_str), false);
+	free(env_str);
+	pwd = get_pwd();
+	if (!pwd)
+		return (false);
+	env_str = ft_strjoin("PWD=", pwd);
+	if (!env_str)
+		return (false);
+	if (!add_env(&shell->env, env_str))
+		return (free(env_str), false);
+	free(env_str);
+	free(pwd);
+	return (true);
+}
+
+int	ft_cd(t_shell *shell, char **env)
+{
+	char	*directory;
+	char	*old_pwd;
+	
+	if (shell->context->args[1] == NULL)
+	{
+		directory = get_env_value("HOME", env, shell);
+		if (!directory || directory[0] == '\0')
+			return (free(directory), ft_putstr_fd("cd: HOME not set", 2), 1);
+	}
+	else
+		directory = ft_strdup(shell->context->args[1]);
+	old_pwd = get_pwd();
+	if (!old_pwd)
+		return (ft_putstr_fd("An error has occurred\n", 2), 1);
+	if (chdir(directory) != 0)
+		return (print_cd_error(directory), free(old_pwd), free(directory), 1);
+	free(directory);
+	if (!update_pwd(shell, old_pwd))
+		return (ft_putstr_fd("An error has occurred\n", 2), free(old_pwd), 1);
+	free(old_pwd);
+	return (0);
 }
 
 int	ft_echo(t_context *context)
@@ -149,25 +202,16 @@ int	ft_echo(t_context *context)
 int	ft_pwd(t_context *context)
 {
 	int		fd;
-	char	*buff;
-	size_t	size;
+	char	*str;
 
 	fd = context->output;
 	if (fd == -1)
 		fd = 1;
-	size = 32;
-	while (1)
-	{
-		buff = malloc(size);
-		if (!buff)
-			return (ft_putstr_fd("An error has occured\n", 2), 1);
-		if (getcwd(buff, size) != NULL)
-			break ;
-		free(buff);
-		size *= 2;
-	}
-	ft_putendl_fd(buff, 2);
-	free(buff);
+	str = get_pwd();
+	if (!str)
+		return (ft_putstr_fd("An error has occurred\n", 2), 1);
+	ft_putendl_fd(str, 2);
+	free(str);
 	return (0);
 }
 
@@ -181,7 +225,7 @@ int	ft_unset(t_shell *shell)
 	{
 		name = ft_strjoin(shell->context->args[i], "=");
 		if (!name)
-			return (ft_putstr_fd("An error has occured\n", 2), 1);
+			return (ft_putstr_fd("An error has occurred\n", 2), 1);
 		remove_from_env(&shell->env, name);
 		free(name);
 		i++;
@@ -262,7 +306,7 @@ int	ft_export(t_shell *shell)
 		if (!validate_export(shell->context->args[i]))
 			return (ft_putstr_fd("Invalid variable name\n", 2), 1);
 		if (!add_env(&shell->env, shell->context->args[i]))
-			return (ft_putstr_fd("An error has occured\n", 2), 1);
+			return (ft_putstr_fd("An error has occurred\n", 2), 1);
 		i++;
 	}
 	if (shell->context->args[1] == NULL)
