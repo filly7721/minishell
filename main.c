@@ -111,6 +111,7 @@ int	main(int ac, char **av, char **env)
 		shell->status = execute(shell, new_env);
 	}
 	free_strs(new_env);
+	g_sig = shell->status;
 	clear_shell(shell);
-	return (shell->status);
+	return (g_sig);
 }

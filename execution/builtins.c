@@ -1,5 +1,87 @@
 #include "minishell.h"
 
+bool	exit_atoi(char *str, int *num)
+{
+	int	sign;
+	int	i;
+
+	i = 0;
+	sign = 1;
+	*num = 0;
+	while(str[i] == ' ')
+		i++;
+	sign = 1;
+	if (str[i] == '-' || str[i] == '+')
+		if (str[i++] == '-')
+			sign = -1;
+	while (ft_isdigit(str[i]))
+		*num = ((*num) * 10 + str[i++] - '0') % 256;
+	while (str[i] == ' ')
+		i++;
+	if (str[i])
+		return (false);
+	if (sign == -1)
+		*num = 256 - *num;
+	return (true);
+}
+
+t_list	*find_lst(t_list *list, char *str, int len)
+{
+	while (list != NULL)
+	{
+		if (ft_strncmp(list->content, str, len) == 0)
+			return (list);
+		list = list->next;
+	}
+	return (NULL);
+}
+
+bool	add_env(t_list **list, char *str)
+{
+	char	*copy;
+	t_list	*temp;
+
+	if (ft_strchr(str, '=') != NULL)
+		copy = ft_strdup(str);
+	else
+		copy = ft_strjoin(str, "=");
+	if (!copy)
+		return (false);
+	temp = find_lst(*list, copy, ft_strchr(copy, '=') - copy);
+	if (temp)
+	{
+		free(temp->content);
+		temp->content = copy;
+		return (true);
+	}
+	temp = ft_lstnew(copy);
+	if (!temp)
+		return (free(copy), false);
+	ft_lstadd_front(list, temp);
+	return (true);
+}
+
+int	ft_exit(t_shell *shell, char **env)
+{
+	int	status;
+
+	if (shell->context->args[2])
+		return (ft_putstr_fd("megashell: exit: too many arguments\n", 2), 1);
+	free_strs(env);
+	if (!shell->context->args[1])
+		(clear_shell(shell), ft_putendl_fd("exit", 2), exit(0));
+	if (exit_atoi(shell->context->args[1], &status) == false)
+	{
+		ft_putstr_fd("megashell: ", 2);
+		ft_putstr_fd("exit: ", 2);
+		ft_putstr_fd(shell->context->args[1], 2);
+		ft_putendl_fd(": numeric argument required", 2);
+		status = 255;
+	}
+	clear_shell(shell);
+	exit(status % 256);
+}
+
 int	ft_env(t_shell *shell, char **env)
 {
 	int		fd;
@@ -12,22 +94,28 @@ int	ft_env(t_shell *shell, char **env)
 	return (0);
 }
 
-int	ft_cd(t_shell *shell, char **env)
+char	*get_pwd()
 {
-	char	*directory;
-	
-	if (shell->context->args[1] == NULL)
+	char	*buff;
+	size_t	size;
+
+	size = 32;
+	while (1)
 	{
-		directory = get_env_value("HOME", env, shell);
-		if (!directory || directory[0] == '\0')
-			return (free(directory), ft_putstr_fd("cd: HOME not set", 2), 1);
+		buff = malloc(size);
+		if (!buff)
+			return (NULL);
+		if (getcwd(buff, size) != NULL)
+			break ;
+		free(buff);
+		size *= 2;
 	}
-	else
-		directory = ft_strdup(shell->context->args[1]);
-	if (chdir(directory) == 0)
-		return (free(directory), 0);
+	return (buff);
+}
+
+void	print_cd_error(char *directory)
+{
 	ft_putstr_fd(directory, 2);
-	free(directory);
 	if (errno == ENOTDIR)
 		ft_putstr_fd(": Not a directory\n", 2);
 	else if (errno == EACCES)
@@ -38,7 +126,54 @@ int	ft_cd(t_shell *shell, char **env)
 		ft_putstr_fd(": File name too long\n", 2);
 	else
 		ft_putstr_fd(": No such file or directory\n", 2);
-	return (1);
+}
+
+bool	update_pwd(t_shell *shell, char *pwd)
+{
+	char	*env_str;
+
+	env_str = ft_strjoin("OLDPWD=", pwd);
+	if (!env_str)
+		return (false);
+	if (!add_env(&shell->env, env_str))
+		return (free(env_str), false);
+	free(env_str);
+	pwd = get_pwd();
+	if (!pwd)
+		return (false);
+	env_str = ft_strjoin("PWD=", pwd);
+	if (!env_str)
+		return (false);
+	if (!add_env(&shell->env, env_str))
+		return (free(env_str), false);
+	free(env_str);
+	free(pwd);
+	return (true);
+}
+
+int	ft_cd(t_shell *shell, char **env)
+{
+	char	*directory;
+	char	*old_pwd;
+	
+	if (shell->context->args[1] == NULL)
+	{
+		directory = get_env_value("HOME", env, shell);
+		if (!directory || directory[0] == '\0')
+			return (free(directory), ft_putstr_fd("cd: HOME not set", 2), 1);
+	}
+	else
+		directory = ft_strdup(shell->context->args[1]);
+	old_pwd = get_pwd();
+	if (!old_pwd)
+		return (ft_putstr_fd("An error has occurred\n", 2), 1);
+	if (chdir(directory) != 0)
+		return (print_cd_error(directory), free(old_pwd), free(directory), 1);
+	free(directory);
+	if (!update_pwd(shell, old_pwd))
+		return (ft_putstr_fd("An error has occurred\n", 2), free(old_pwd), 1);
+	free(old_pwd);
+	return (0);
 }
 
 int	ft_echo(t_context *context)
@@ -67,25 +202,16 @@ int	ft_echo(t_context *context)
 int	ft_pwd(t_context *context)
 {
 	int		fd;
-	char	*buff;
-	size_t	size;
+	char	*str;
 
 	fd = context->output;
 	if (fd == -1)
 		fd = 1;
-	size = 32;
-	while (1)
-	{
-		buff = malloc(size);
-		if (!buff)
-			return (ft_putstr_fd("An error has occured\n", 2), 1);
-		if (getcwd(buff, size) != NULL)
-			break ;
-		free(buff);
-		size *= 2;
-	}
-	ft_putendl_fd(buff, 2);
-	free(buff);
+	str = get_pwd();
+	if (!str)
+		return (ft_putstr_fd("An error has occurred\n", 2), 1);
+	ft_putendl_fd(str, 2);
+	free(str);
 	return (0);
 }
 
@@ -99,7 +225,7 @@ int	ft_unset(t_shell *shell)
 	{
 		name = ft_strjoin(shell->context->args[i], "=");
 		if (!name)
-			return (ft_putstr_fd("An error has occured\n", 2), 1);
+			return (ft_putstr_fd("An error has occurred\n", 2), 1);
 		remove_from_env(&shell->env, name);
 		free(name);
 		i++;
@@ -166,24 +292,6 @@ int	sort_print(t_list *list, int fd)
 	return (ft_lstclear(&list, free), 0);
 }
 
-bool	add_env(t_list **list, char *str)
-{
-	char	*copy;
-	t_list	*temp;
-
-	if (ft_strchr(str, '=') != NULL)
-		copy = ft_strdup(str);
-	else
-		copy = ft_strjoin(str, "=");
-	if (!copy)
-		return (ft_putstr_fd("An error has occured\n", 2), 1);
-	temp = ft_lstnew(copy);
-	if (!temp)
-		return (ft_putstr_fd("An error has occured\n", 2), free(copy), 1);
-	ft_lstadd_front(list, temp);
-	return (true);
-}
-
 int	ft_export(t_shell *shell)
 {
 	int		i;
@@ -198,7 +306,7 @@ int	ft_export(t_shell *shell)
 		if (!validate_export(shell->context->args[i]))
 			return (ft_putstr_fd("Invalid variable name\n", 2), 1);
 		if (!add_env(&shell->env, shell->context->args[i]))
-			return (ft_putstr_fd("An error has occured\n", 2), 1);
+			return (ft_putstr_fd("An error has occurred\n", 2), 1);
 		i++;
 	}
 	if (shell->context->args[1] == NULL)
@@ -211,6 +319,7 @@ int	execute_builtin(t_shell *shell, char **env)
 	int	status;
 
 	clear_context_list(&shell->context->next);
+	status = 1;
 	if (ft_strncmp(shell->context->cmd, "echo", -1) == 0)
 		status = ft_echo(shell->context);
 	else if (ft_strncmp(shell->context->cmd, "pwd", -1) == 0)
@@ -223,11 +332,8 @@ int	execute_builtin(t_shell *shell, char **env)
 		status = ft_cd(shell, env);
 	else if (ft_strncmp(shell->context->cmd, "env", -1) == 0)
 		status = ft_env(shell, env);
-	else
-	{
-		ft_putstr_fd("unhandled builtin", 2);
-		status = 1;
-	}
+	else if (ft_strncmp(shell->context->cmd, "exit", -1) == 0)
+		status = ft_exit(shell, env);
 	free_context(shell->context);
 	shell->context = NULL;
 	free_strs(env);
@@ -249,6 +355,8 @@ bool	is_builtin(char *str)
 	else if (ft_strncmp(str, "cd", -1) == 0)
 		return (true);
 	else if (ft_strncmp(str, "env", -1) == 0)
+		return (true);
+	else if (ft_strncmp(str, "exit", -1) == 0)
 		return (true);
 	return (false);
 }
