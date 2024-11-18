@@ -26,9 +26,9 @@ char	*get_word(char *str)
 		if (*str == '\\')
 			str++;
 		else if (*str == '"')
-			str = strrchr(str + 1, '"');
+			str = ft_strchr(str + 1, '"');
 		else if (*str == '\'')
-			str = strrchr(str + 1, '\'');
+			str = ft_strchr(str + 1, '\'');
 		//TODO implement word rules 
 		else if (!ft_isalnum(*str) && *str != '$')
 			return (str);
