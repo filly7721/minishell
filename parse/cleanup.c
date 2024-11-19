@@ -61,27 +61,30 @@ char	*expanded_str(char *str, char *var, char **env, t_shell *shell)
 bool	expand_tree(t_tree *node, char **env, t_shell *shell)
 {
 	int	i;
+	bool	dquote;
 
 	if (node->cmd.type == HEREDOC)
 		return (expand_tree(node->left, env, shell));
 	if (node->cmd.type != WORD)
-		return (expand_tree(node->left, env, shell) && expand_tree(node->right, env, shell));
-	i = 0;
-	while (node->cmd.str[i])
+		return (expand_tree(node->left, env, shell)
+			&& expand_tree(node->right, env, shell));
+	i = -1;
+	dquote = false;
+	while (node->cmd.str && node->cmd.str[++i])
 	{
-		if (node->cmd.str[i] == '$')
+		if (node->cmd.str[i] == '"')
+			dquote = !dquote;
+		else if (node->cmd.str[i] == '\'' && dquote == false)
+			i = ft_strchr(node->cmd.str + i + 1, '\'') - node->cmd.str;
+		else if (node->cmd.str[i] == '$')
 		{
-			node->cmd.str[i] = '\0';
-			i++;
+			node->cmd.str[i++] = '\0';
 			node->cmd.str
 				= expanded_str(node->cmd.str, &node->cmd.str[i--], env, shell);
-			if (node->cmd.str == NULL)
-				return (false);
-			continue ;
+			i--;
 		}
-		i++;
 	}
-	return (true);
+	return (node->cmd.str != NULL);
 }
 
 char	*snip_snip(char *str, int *i, char *end)
