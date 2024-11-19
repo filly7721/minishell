@@ -10,9 +10,7 @@ char	*validate_redirections(char *str)
 	str++;
 	while (*str)
 	{
-		if (*str == '\\')
-			str++;
-		else if (*str != ' ')
+		if (*str != ' ')
 			break ;
 		str++;
 	}
@@ -20,9 +18,7 @@ char	*validate_redirections(char *str)
 		return (NULL);
 	while (*str)
 	{
-		if (*str == '\\')
-			str++;
-		else if (*str == '"' || *str == '\'')
+		if (*str == '"' || *str == '\'')
 			str = ft_strchr(str + 1, *str);
 		else if (ft_strchr(" <>|&", *str))
 			break ;
@@ -39,9 +35,7 @@ char	*validate_pipe(char *str)
 	str++;
 	while (*str)
 	{
-		if (*str == '\\')
-			str++;
-		else if (*str != ' ')
+		if (*str != ' ')
 			break ;
 		str++;
 	}
@@ -57,9 +51,7 @@ bool	validate_string(char *str)
 {
 	while (*str)
 	{
-		if (*str == '\\')
-			str++;
-		else if (*str == '\'' || *str == '"')
+		if (*str == '\'' || *str == '"')
 			str = ft_strchr(str + 1, *str);
 		else if (*str == '<' || *str == '>')
 			str = validate_redirections(str);

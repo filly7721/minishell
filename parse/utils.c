@@ -4,9 +4,7 @@ char	*find_unescaped(char *str, char *symbol)
 {
 	while (*str != '\0')
 	{
-		if (*str == '\\')
-			str++;
-		else if (*str == '"')
+		if (*str == '"')
 			str = ft_strchr(str + 1, '"');
 		else if (*str == '\'')
 			str = ft_strchr(str + 1, '\'');
@@ -23,9 +21,7 @@ char	*get_word(char *str)
 		str++;
 	while (*str != '\0')
 	{
-		if (*str == '\\')
-			str++;
-		else if (*str == '"')
+		if (*str == '"')
 			str = ft_strchr(str + 1, '"');
 		else if (*str == '\'')
 			str = ft_strchr(str + 1, '\'');
@@ -67,9 +63,7 @@ char	*find_redirect(char *str, t_type *type)
 {
 	while (*str != '\0')
 	{
-		if (*str == '\\')
-			str++;
-		else if (*str == '"')
+		if (*str == '"')
 			str = ft_strchr(str + 1, '"');
 		else if (*str == '\'')
 			str = ft_strchr(str + 1, '\'');

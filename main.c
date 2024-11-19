@@ -59,7 +59,7 @@ char	*get_input(void)
 		if (!str)
 			return (NULL);
 		if (validate_string(str))
-			return (str); // TODO add history
+			return (str);
 		ft_putstr_fd("parse error\n", 2);
 		free(str);
 	}

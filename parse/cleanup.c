@@ -58,33 +58,32 @@ char	*expanded_str(char *str, char *var, char **env, t_shell *shell)
 	return (lstr);
 }
 
-bool	expand_tree(t_tree *node, char **env, t_shell *shell)
+bool	expand_tree(t_tree *n, char **env, t_shell *shell)
 {
-	int	i;
+	int		i;
 	bool	dquote;
 
-	if (node->cmd.type == HEREDOC)
-		return (expand_tree(node->left, env, shell));
-	if (node->cmd.type != WORD)
-		return (expand_tree(node->left, env, shell)
-			&& expand_tree(node->right, env, shell));
+	if (n->cmd.type == HEREDOC)
+		return (expand_tree(n->left, env, shell));
+	if (n->cmd.type != WORD)
+		return (expand_tree(n->left, env, shell)
+			&& expand_tree(n->right, env, shell));
 	i = -1;
 	dquote = false;
-	while (node->cmd.str && node->cmd.str[++i])
+	while (n->cmd.str && n->cmd.str[++i])
 	{
-		if (node->cmd.str[i] == '"')
+		if (n->cmd.str[i] == '"')
 			dquote = !dquote;
-		else if (node->cmd.str[i] == '\'' && dquote == false)
-			i = ft_strchr(node->cmd.str + i + 1, '\'') - node->cmd.str;
-		else if (node->cmd.str[i] == '$')
+		else if (n->cmd.str[i] == '\'' && dquote == false)
+			i = ft_strchr(n->cmd.str + i + 1, '\'') - n->cmd.str;
+		else if (n->cmd.str[i] == '$')
 		{
-			node->cmd.str[i++] = '\0';
-			node->cmd.str
-				= expanded_str(node->cmd.str, &node->cmd.str[i--], env, shell);
+			n->cmd.str[i++] = '\0';
+			n->cmd.str = expanded_str(n->cmd.str, &n->cmd.str[i--], env, shell);
 			i--;
 		}
 	}
-	return (node->cmd.str != NULL);
+	return (n->cmd.str != NULL);
 }
 
 char	*snip_snip(char *str, int *i, char *end)
@@ -120,9 +119,7 @@ bool	removing_quotes(t_tree *node, char **env)
 		i = 0;
 		while ((*strs)[i])
 		{
-			if ((*strs)[i] == '\\')
-				i++;
-			else if ((*strs)[i] == '"' || (*strs)[i] == '\'')
+			if ((*strs)[i] == '"' || (*strs)[i] == '\'')
 				(*strs) = snip_snip((*strs), &i,
 						ft_strchr(&((*strs)[i + 1]), (*strs)[i]));
 			if ((*strs) == NULL)
