@@ -88,7 +88,7 @@ int	execute(t_shell *shell, char **env)
 {
 	pid_t		pid;
 	int			status;
-	
+
 	shell->context = create_context();
 	if (!shell->context)
 		return (ft_putstr_fd("An error has occurred: ", 2), 1);

@@ -8,7 +8,7 @@ bool	exit_atoi(char *str, int *num)
 	i = 0;
 	sign = 1;
 	*num = 0;
-	while(str[i] == ' ')
+	while (str[i] == ' ')
 		i++;
 	sign = 1;
 	if (str[i] == '-' || str[i] == '+')
@@ -94,7 +94,7 @@ int	ft_env(t_shell *shell, char **env)
 	return (0);
 }
 
-char	*get_pwd()
+char	*get_pwd(void)
 {
 	char	*buff;
 	size_t	size;
@@ -155,7 +155,7 @@ int	ft_cd(t_shell *shell, char **env)
 {
 	char	*directory;
 	char	*old_pwd;
-	
+
 	if (shell->context->args[1] == NULL)
 	{
 		directory = get_env_value("HOME", env, shell);
@@ -310,7 +310,8 @@ int	ft_export(t_shell *shell)
 		i++;
 	}
 	if (shell->context->args[1] == NULL)
-		return (sort_print(ft_lstmap(shell->env, (void *(*)(void *))ft_strdup, free), fd));
+		return (sort_print(ft_lstmap(shell->env,
+					(void *(*)(void *))ft_strdup, free), fd));
 	return (0);
 }
 

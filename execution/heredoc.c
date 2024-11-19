@@ -3,7 +3,7 @@
 char	*find_and_expand(char *str, char **env, t_shell *shell)
 {
 	int	i;
-	
+
 	i = 0;
 	while (str[i])
 	{

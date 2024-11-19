@@ -103,10 +103,10 @@ t_tree	*construct_ast(char *str, char **env, t_shell *shell)
 		return (ft_putstr_fd("split redirects failed\n", 2),
 			free_tree(head), NULL);
 	if (!expand_tree(head, env, shell))
-		return (ft_putstr_fd("Tree cleanup failed\n", 2), free_tree(head), NULL);
+		return (ft_putstr_fd("Cleanup failed\n", 2), free_tree(head), NULL);
 	if (!split_args(head))
-		return (ft_putstr_fd("Tree cleanup failed\n", 2), free_tree(head), NULL);
+		return (ft_putstr_fd("Cleanup failed\n", 2), free_tree(head), NULL);
 	if (!removing_quotes(head, env))
-		return (ft_putstr_fd("Tree cleanup failed\n", 2), free_tree(head), NULL);
+		return (ft_putstr_fd("Cleanup failed\n", 2), free_tree(head), NULL);
 	return (head);
 }
