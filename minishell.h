@@ -108,6 +108,7 @@ void		remove_from_env(t_list **head, char *name);
 bool		validate_string(char *str);
 char		*expanded_str(char *str, char *var, char **env, t_shell *shell);
 char		*get_env_value(char *name, char **env, t_shell *shell);
-
+bool		add_env(t_list **list, char *str);
+t_list		*find_lst(t_list *list, char *str, int len);
 
 #endif

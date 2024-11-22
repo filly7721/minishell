@@ -1,5 +1,63 @@
 #include "minishell.h"
 
+int	shlvl_atoi(char *str)
+{
+	int	sign;
+	int	res;
+
+	while (*str == ' ')
+		str++;
+	sign = 1;
+	if (*str == '-' || *str == '+')
+		if (*str++ == '-')
+			sign = -1;
+	res = 0;
+	while (ft_isdigit(*str))
+		res = res * 10 + *str++ - '0';
+	if (*str != '\0')
+		return (0);
+	res++;
+	if (sign == -1)
+		return (-1);
+	return (res);	
+}
+
+t_list	*find_lst(t_list *list, char *str, int len)
+{
+	while (list != NULL)
+	{
+		if (ft_strncmp(list->content, str, len) == 0)
+			return (list);
+		list = list->next;
+	}
+	return (NULL);
+}
+
+bool	add_env(t_list **list, char *str)
+{
+	char	*copy;
+	t_list	*temp;
+
+	if (ft_strchr(str, '=') != NULL)
+		copy = ft_strdup(str);
+	else
+		copy = ft_strjoin(str, "=");
+	if (!copy)
+		return (false);
+	temp = find_lst(*list, copy, ft_strchr(copy, '=') - copy);
+	if (temp)
+	{
+		free(temp->content);
+		temp->content = copy;
+		return (true);
+	}
+	temp = ft_lstnew(copy);
+	if (!temp)
+		return (free(copy), false);
+	ft_lstadd_front(list, temp);
+	return (true);
+}
+
 char	**export_env(t_shell *shell)
 {
 	t_list	*curr;
@@ -25,18 +83,40 @@ char	**export_env(t_shell *shell)
 	return (env);
 }
 
+bool	env_init(t_shell *shell)
+{
+	int		shlvl;
+	t_list	*node;
+	char	*str;
+	char	*num;
+
+	node = find_lst(shell->env, "SHLVL=", 6);
+	shlvl = 1;
+	if (node)
+		shlvl = shlvl_atoi((char *)node->content + 6);
+	if (shlvl < 0)
+		shlvl = 0;
+	num = ft_itoa(shlvl);
+	if (!num)
+		return (false);
+	str = ft_strjoin("SHLVL=", num);
+	if (!str || !add_env(&shell->env, str))
+		return (free(str), false);
+	node = find_lst(shell->env, "OLDPWD=", 7);
+	if (!node)
+		return (add_env(&shell->env, "OLDPWD"));
+	return (true);
+}
+
 t_shell	*create_shell(char **env)
 {
 	t_shell	*shell;
 	t_list	*node;
 	char	*str;
 
-	shell = malloc(sizeof(t_shell));
+	shell = ft_calloc(sizeof(t_shell), 1);
 	if (!shell)
 		return (NULL);
-	shell->context = NULL;
-	shell->env = NULL;
-	shell->tree = NULL;
 	while (*env)
 	{
 		str = ft_strdup(*env);
@@ -49,7 +129,8 @@ t_shell	*create_shell(char **env)
 		ft_lstadd_back(&shell->env, node);
 		env++;
 	}
-	shell->status = 0;
+	if (env_init(shell) == false)
+		return (clear_shell(shell), NULL);
 	return (shell);
 }
 
