@@ -55,7 +55,10 @@ char	*get_input(void)
 	
 	while (1)
 	{
-		str = readline("megashell> ");
+		if (isatty(0))
+			str = readline("megashell> ");
+		else
+			str = readline("");
 		if (!str)
 			return (NULL);
 		if (validate_string(str))
@@ -88,6 +91,8 @@ int	main(int ac, char **av, char **env)
 	shell = create_shell(env);
 	if (!shell)
 		return (1);
+	if (!isatty(0))
+		rl_outstream = stdin;
 	while (1)
 	{
 		signal(SIGINT, onsignint);
