@@ -61,6 +61,7 @@ char	*get_input(void)
 			str = readline("");
 		if (!str)
 			return (NULL);
+		add_history(str);
 		if (validate_string(str))
 			return (str);
 		ft_putstr_fd("parse error\n", 2);
@@ -101,7 +102,6 @@ int	main(int ac, char **av, char **env)
 		if (!new_env)
 			return (clear_shell(shell), ft_putstr_fd("env failed`\n", 2), 1);
 		str = get_input();
-		add_history(str);
 		if (!str)
 			break ;
 		if (g_sig != 0)

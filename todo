@@ -24,7 +24,7 @@ ignore empty strings
 [x]	exit is broken (too many arguments);
 [x] empty executable note gives permission denied
 [x]	unset path derefences null :SKULL:
-add to history with parse error
+[x]	add to history with parse error
 validate empty side from pipe
 (testcase) echo -n -n -nnnnnnn -nnnn BATMAN!
 (testcase) $1234 (takes only the first digit it sees)
