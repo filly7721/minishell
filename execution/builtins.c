@@ -29,11 +29,14 @@ int	ft_exit(t_shell *shell, char **env)
 {
 	int	status;
 
-	if (shell->context->args[2])
+	if (shell->context->args[1] && shell->context->args[2])
 		return (ft_putstr_fd("megashell: exit: too many arguments\n", 2), 1);
 	free_strs(env);
 	if (!shell->context->args[1])
-		(clear_shell(shell), ft_putendl_fd("exit", 2), exit(0));
+	{
+		status = shell->status;
+		(clear_shell(shell), ft_putendl_fd("exit", 2), exit(status));
+	}
 	if (exit_atoi(shell->context->args[1], &status) == false)
 	{
 		ft_putstr_fd("megashell: ", 2);
