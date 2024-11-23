@@ -49,14 +49,22 @@ char	*validate_pipe(char *str)
 /// @return you are valid
 bool	validate_string(char *str)
 {
+	int	tokens;
+
+	tokens = 0;
 	while (*str)
 	{
-		if (*str == '\'' || *str == '"')
+		if ((*str == '\'' || *str == '"') && ++tokens)
 			str = ft_strchr(str + 1, *str);
-		else if (*str == '<' || *str == '>')
+		else if ((*str == '<' || *str == '>') && ++tokens)
 			str = validate_redirections(str);
 		else if (*str == '|')
+		{
 			str = validate_pipe(str);
+			if (tokens == 0 || str == NULL)
+				return (false);
+			tokens = 0;
+		}
 		if (str == NULL)
 			return (false);
 		str++;

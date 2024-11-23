@@ -25,7 +25,7 @@ ignore empty strings
 [x] empty executable note gives permission denied
 [x]	unset path derefences null :SKULL:
 [x]	add to history with parse error
-validate empty side from pipe
+[x]	validate empty side from pipe
 (testcase) echo -n -n -nnnnnnn -nnnn BATMAN!
 (testcase) $1234 (takes only the first digit it sees)
 ctrl d in heredoc doesnt cancel other heredocs
