@@ -19,4 +19,15 @@ ignore empty strings
 [x]	env_init
 [x]	make shlvl do +1
 [x]	make empty oldpwd
-ask about _ in env
+[x]	ask about _ in env
+[x]	handle enoent in get_pwd;
+[x]	exit is broken (too many arguments);
+[x] empty executable note gives permission denied
+[x]	unset path derefences null :SKULL:
+add to history with parse error
+validate empty side from pipe
+(testcase) echo -n -n -nnnnnnn -nnnn BATMAN!
+(testcase) $1234 (takes only the first digit it sees)
+ctrl d in heredoc doesnt cancel other heredocs
+ctrl c cancels all heredocs;
+empty env breaks export (check others too)
