@@ -110,5 +110,6 @@ char		*expanded_str(char *str, char *var, char **env, t_shell *shell);
 char		*get_env_value(char *name, char **env, t_shell *shell);
 bool		add_env(t_list **list, char *str);
 t_list		*find_lst(t_list *list, char *str, int len);
+char		*find_and_expand(char *str, char **env, t_shell *shell);
 
 #endif

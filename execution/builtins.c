@@ -58,7 +58,7 @@ int	ft_env(t_shell *shell, char **env)
 	return (0);
 }
 
-char	*get_pwd(void)
+char	*get_pwd(t_shell *shell, char **env)
 {
 	char	*buff;
 	size_t	size;
@@ -72,9 +72,11 @@ char	*get_pwd(void)
 		if (getcwd(buff, size) != NULL)
 			break ;
 		free(buff);
+		if (errno == ENOENT)
+			return (find_and_expand(ft_strdup("$PWD"), env, shell));
 		size *= 2;
 	}
-	return (buff);
+	return (ft_strappend(buff, ""));
 }
 
 void	print_cd_error(char *directory)
@@ -92,7 +94,7 @@ void	print_cd_error(char *directory)
 		ft_putstr_fd(": No such file or directory\n", 2);
 }
 
-bool	update_pwd(t_shell *shell, char *pwd)
+bool	update_pwd(t_shell *shell, char *pwd, char **env)
 {
 	char	*env_str;
 
@@ -102,7 +104,7 @@ bool	update_pwd(t_shell *shell, char *pwd)
 	if (!add_env(&shell->env, env_str))
 		return (free(env_str), false);
 	free(env_str);
-	pwd = get_pwd();
+	pwd = get_pwd(shell, env);
 	if (!pwd)
 		return (false);
 	env_str = ft_strjoin("PWD=", pwd);
@@ -128,13 +130,13 @@ int	ft_cd(t_shell *shell, char **env)
 	}
 	else
 		directory = ft_strdup(shell->context->args[1]);
-	old_pwd = get_pwd();
+	old_pwd = get_pwd(shell, env);
 	if (!old_pwd)
 		return (ft_putstr_fd("An error has occurred\n", 2), 1);
 	if (chdir(directory) != 0)
 		return (print_cd_error(directory), free(old_pwd), free(directory), 1);
 	free(directory);
-	if (!update_pwd(shell, old_pwd))
+	if (!update_pwd(shell, old_pwd, env))
 		return (ft_putstr_fd("An error has occurred\n", 2), free(old_pwd), 1);
 	free(old_pwd);
 	return (0);
@@ -163,7 +165,7 @@ int	ft_echo(t_context *context)
 	return (0);
 }
 
-int	ft_pwd(t_context *context)
+int	ft_pwd(t_shell *shell, char **env, t_context *context)
 {
 	int		fd;
 	char	*str;
@@ -171,7 +173,7 @@ int	ft_pwd(t_context *context)
 	fd = context->output;
 	if (fd == -1)
 		fd = 1;
-	str = get_pwd();
+	str = get_pwd(shell, env);
 	if (!str)
 		return (ft_putstr_fd("An error has occurred\n", 2), 1);
 	ft_putendl_fd(str, 2);
@@ -288,7 +290,7 @@ int	execute_builtin(t_shell *shell, char **env)
 	if (ft_strncmp(shell->context->cmd, "echo", -1) == 0)
 		status = ft_echo(shell->context);
 	else if (ft_strncmp(shell->context->cmd, "pwd", -1) == 0)
-		status = ft_pwd(shell->context);
+		status = ft_pwd(shell, env, shell->context);
 	else if (ft_strncmp(shell->context->cmd, "unset", -1) == 0)
 		status = ft_unset(shell);
 	else if (ft_strncmp(shell->context->cmd, "export", -1) == 0)
