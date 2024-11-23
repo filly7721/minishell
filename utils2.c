@@ -50,7 +50,7 @@ char	**quote_split(char *str, char c)
 			str++;
 		if (*str)
 			res[i++] = extract_word(str, c);
-		if (res[i - 1] == NULL)
+		if (*str && res[i - 1] == NULL)
 			return (free_strs(res), NULL);
 		while (*str != '\0' && *str != c)
 		{
