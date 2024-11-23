@@ -25,8 +25,7 @@ char	*get_word(char *str)
 			str = ft_strchr(str + 1, '"');
 		else if (*str == '\'')
 			str = ft_strchr(str + 1, '\'');
-		//TODO implement word rules
-		else if (!ft_isalnum(*str) && *str != '$')
+		else if (ft_strchr(" |<>\t", *str) != NULL)
 			return (str);
 		str++;
 	}
