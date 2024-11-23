@@ -26,8 +26,8 @@ ignore empty strings
 [x]	unset path derefences null :SKULL:
 [x]	add to history with parse error
 [x]	validate empty side from pipe
+[x]	empty env breaks export (check others too)
 (testcase) echo -n -n -nnnnnnn -nnnn BATMAN!
 (testcase) $1234 (takes only the first digit it sees)
 ctrl d in heredoc doesnt cancel other heredocs
 ctrl c cancels all heredocs;
-empty env breaks export (check others too)

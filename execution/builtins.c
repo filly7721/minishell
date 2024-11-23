@@ -240,7 +240,7 @@ int	sort_print(t_list *list, int fd)
 	t_list	*curr;
 
 	if (!list)
-		return (ft_putstr_fd("An error has occurred\n", 2), 1);
+		return (0);
 	count = ft_lstsize(list);
 	while (count)
 	{
