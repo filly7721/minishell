@@ -100,8 +100,10 @@ bool	env_init(t_shell *shell)
 	if (!num)
 		return (false);
 	str = ft_strjoin("SHLVL=", num);
+	free(num);
 	if (!str || !add_env(&shell->env, str))
 		return (free(str), false);
+	free(str);
 	node = find_lst(shell->env, "OLDPWD=", 7);
 	if (!node)
 		return (add_env(&shell->env, "OLDPWD"));
