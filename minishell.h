@@ -10,6 +10,8 @@
 # include "libft.h"
 # include <sys/wait.h>
 # include <errno.h>
+# include <dirent.h>
+# include <dirent.h>
 
 extern int	g_sig;
 typedef struct s_context

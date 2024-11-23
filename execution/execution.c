@@ -1,13 +1,31 @@
 #include "minishell.h"
 
+bool	is_whitespace(char *str)
+{
+	while (*str == ' ' || * str == '\t')
+		str++;
+	return (*str == '\0');
+}
+
 int	get_execution_error(char *cmd)
 {
+	int	errnum;
+	DIR	*dir;
+
+	errnum = errno;
+	ft_putstr_fd("megashell: ", 2);
 	ft_putstr_fd(cmd, 2);
-	if (errno == EACCES)
+	dir = opendir(cmd);
+	if (dir)
+		return (closedir(dir), ft_putstr_fd(": is a directory\n", 2), 126);
+	if (is_whitespace(cmd))
+		return (ft_putstr_fd(": Command not found\n", 2), 127);
+	if (errnum == EACCES)
 		return (ft_putstr_fd(": Permission denied\n", 2), 126);
 	if (ft_strchr(cmd, '/') != NULL)
 		ft_putstr_fd(": No such file or directory\n", 2);
-	ft_putstr_fd(": Command not found\n", 2);
+	else
+		ft_putstr_fd(": Command not found\n", 2);
 	return (127);
 }
 
