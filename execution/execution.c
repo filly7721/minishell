@@ -84,6 +84,24 @@ bool	execute_context(t_shell *shell, char **env, pid_t *pid)
 	return (true);
 }
 
+void	print_signal_errors(int status)
+{
+	if (status == SIGINT)
+		ft_putstr_fd("\n", 2);
+	else if (status == SIGQUIT)
+	{
+		ft_putstr_fd("Quit: ", 2);
+		ft_putnbr_fd(status, 2);
+		ft_putstr_fd(": womp womp\n", 2);
+	}
+	else if (status == SIGSEGV)
+	{
+		ft_putstr_fd("Segmentation fault: ", 2);
+		ft_putnbr_fd(status, 2);
+		ft_putstr_fd(": is bro dereferencing null 💀\n", 2);
+	}
+}
+
 int	execute(t_shell *shell, char **env)
 {
 	pid_t		pid;
@@ -107,6 +125,6 @@ int	execute(t_shell *shell, char **env)
 	while (wait(NULL) != -1)
 		;
 	if (WIFSIGNALED(status))
-		return (128 + WTERMSIG(status));
+		return (print_signal_errors(WTERMSIG(status)), 128 + WTERMSIG(status));
 	return (WEXITSTATUS(status));
 }
