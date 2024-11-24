@@ -25,30 +25,6 @@ char	*get_type(t_type type)
 	return ("NONE");
 }
 
-void	print_tree(t_tree *head, int depth)
-{
-	int		i;
-	char	**strs;
-
-	if (!head)
-		return ;
-	print_tree(head->right, depth + 1);
-	i = 0;
-	while (i++ < depth)
-		printf("\t");
-	if (head->cmd.type == WORD)
-	{
-		printf("[");
-		strs = head->cmd.strs;
-		while (*strs)
-			printf("%s, ", *strs++);
-		printf("]\n");
-	}
-	else
-		printf("(%s:%s)\n", get_type(head->cmd.type), head->cmd.str);
-	print_tree(head->left, depth + 1);
-}
-
 char	*get_input(void)
 {
 	char	*str;
@@ -121,7 +97,6 @@ int	main(int ac, char **av, char **env)
 		shell->tree = construct_ast(str, new_env, shell);
 		if (!shell->tree)
 			return (clear_shell(shell), ft_putstr_fd("Ast failed`\n", 2), 1);
-		print_tree(shell->tree, 0);
 		shell->status = execute(shell, new_env);
 	}
 	free_strs(new_env);
