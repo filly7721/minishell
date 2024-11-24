@@ -32,6 +32,6 @@ ignore empty strings
 [x]	(testcase) echo -n -n -nnnnnnn -nnnn BATMAN!
 [x]	(testcase) $1234 (takes only the first digit it sees)
 [x]	guard close syscall from -1;
-count words as token in validate
+[x]	count words as token in validate
 execve directory errors should print the directory msg if there is a slash
 number start in var in export

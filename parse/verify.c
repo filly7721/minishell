@@ -67,6 +67,8 @@ bool	validate_string(char *str)
 				return (false);
 			tokens = 0;
 		}
+		else if (*str != ' ' || *str != '\t')
+			tokens++;
 		if (str == NULL)
 			return (false);
 		str++;
