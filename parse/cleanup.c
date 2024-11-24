@@ -24,6 +24,13 @@ char	*get_var_name(char *str)
 	char	*word;
 
 	word = str;
+	if (ft_isdigit(*str))
+	{
+		word = ft_strdup(" ");
+		if (word)
+			word[0] = *str;
+		return (word);
+	}
 	if (*str == '?')
 		return (ft_strdup("?"));
 	while (*word == '_' || ft_isalnum(*word))

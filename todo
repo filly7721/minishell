@@ -30,5 +30,5 @@ ignore empty strings
 [x]	ctrl c cancels all heredocs;
 [x]	ctrl d in heredoc doesnt cancel other heredocs
 [x]	(testcase) echo -n -n -nnnnnnn -nnnn BATMAN!
-(testcase) $1234 (takes only the first digit it sees)
+[x]	(testcase) $1234 (takes only the first digit it sees)
 guard close syscall from -1;
