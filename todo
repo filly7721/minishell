@@ -34,4 +34,4 @@ ignore empty strings
 [x]	guard close syscall from -1;
 [x]	count words as token in validate
 [x]	execve directory errors should print the directory msg if there is a slash
-number start in var in export
+[x]	number start in var in unset
