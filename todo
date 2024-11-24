@@ -31,4 +31,7 @@ ignore empty strings
 [x]	ctrl d in heredoc doesnt cancel other heredocs
 [x]	(testcase) echo -n -n -nnnnnnn -nnnn BATMAN!
 [x]	(testcase) $1234 (takes only the first digit it sees)
-guard close syscall from -1;
+[x]	guard close syscall from -1;
+count words as token in validate
+execve directory errors should print the directory msg if there is a slash
+number start in var in export
