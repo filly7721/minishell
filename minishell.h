@@ -96,7 +96,7 @@ t_context	*create_context(void);
 void		free_strs(char **strs);
 char		*ft_strappend(char *str1, char *str2);
 void		free_null(void **ptr);
-void		free_tree(t_tree *head);
+void		free_tree(t_tree **head);
 char		**quote_split(char *str, char c);
 
 bool		trim_tree(t_tree *node, char **env);
@@ -113,5 +113,5 @@ char		*get_env_value(char *name, char **env, t_shell *shell);
 bool		add_env(t_list **list, char *str);
 t_list		*find_lst(t_list *list, char *str, int len);
 char		*find_and_expand(char *str, char **env, t_shell *shell);
-
+void		onsignint(int signum);
 #endif

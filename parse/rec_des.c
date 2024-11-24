@@ -98,15 +98,15 @@ t_tree	*construct_ast(char *str, char **env, t_shell *shell)
 	if (!head)
 		return (NULL);
 	if (!split_pipes(head))
-		return (ft_putstr_fd("split pipes failed\n", 2), free_tree(head), NULL);
+		return (ft_putstr_fd("split pipes failed\n", 2), free_tree(&head), NULL);
 	if (!split_redirects(head))
 		return (ft_putstr_fd("split redirects failed\n", 2),
-			free_tree(head), NULL);
+			free_tree(&head), NULL);
 	if (!expand_tree(head, env, shell))
-		return (ft_putstr_fd("Cleanup failed\n", 2), free_tree(head), NULL);
+		return (ft_putstr_fd("Cleanup failed\n", 2), free_tree(&head), NULL);
 	if (!split_args(head))
-		return (ft_putstr_fd("Cleanup failed\n", 2), free_tree(head), NULL);
+		return (ft_putstr_fd("Cleanup failed\n", 2), free_tree(&head), NULL);
 	if (!removing_quotes(head, env))
-		return (ft_putstr_fd("Cleanup failed\n", 2), free_tree(head), NULL);
+		return (ft_putstr_fd("Cleanup failed\n", 2), free_tree(&head), NULL);
 	return (head);
 }

@@ -128,12 +128,11 @@ int	execute(t_shell *shell, char **env)
 	shell->context = create_context();
 	if (!shell->context)
 		return (ft_putstr_fd("An error has occurred: ", 2), 1);
-	if (premature_visitation(shell->tree, shell->context, env, shell) == false)
-		return (clear_context_list(&shell->context), free_strs(env), 0);
-	traverse_tree(shell->tree, env, shell->context);
-	free_tree(shell->tree);
-	shell->tree = NULL;
 	signal(SIGINT, SIG_IGN);
+	if (premature_visitation(shell->tree, shell->context, env, shell) == false)
+		return (clear_context_list(&shell->context), free_tree(&shell->tree), free_strs(env), 0);
+	traverse_tree(shell->tree, env, shell->context);
+	free_tree(&shell->tree);
 	if (shell->context->next == NULL && is_builtin(shell->context->cmd))
 		return (execute_builtin(shell, env));
 	if (!execute_context(shell, env, &pid))

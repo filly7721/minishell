@@ -27,7 +27,8 @@ ignore empty strings
 [x]	add to history with parse error
 [x]	validate empty side from pipe
 [x]	empty env breaks export (check others too)
+[x]	ctrl c cancels all heredocs;
+[x]	ctrl d in heredoc doesnt cancel other heredocs
 (testcase) echo -n -n -nnnnnnn -nnnn BATMAN!
 (testcase) $1234 (takes only the first digit it sees)
-ctrl d in heredoc doesnt cancel other heredocs
-ctrl c cancels all heredocs;
+guard close syscall from -1;

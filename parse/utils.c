@@ -47,15 +47,16 @@ t_tree	*create_node(char *str)
 	return (node);
 }
 
-void	free_tree(t_tree *head)
+void	free_tree(t_tree **head)
 {
-	if (head == NULL)
+	if (*head == NULL)
 		return ;
-	free_tree(head->left);
-	free_tree(head->right);
-	free(head->cmd.str);
-	free_strs(head->cmd.strs);
-	free(head);
+	free_tree(&(*head)->left);
+	free_tree(&(*head)->right);
+	free((*head)->cmd.str);
+	free_strs((*head)->cmd.strs);
+	free(*head);
+	*head = NULL;
 }
 
 char	*find_redirect(char *str, t_type *type)

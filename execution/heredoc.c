@@ -20,10 +20,38 @@ char	*find_and_expand(char *str, char **env, t_shell *shell)
 	return (str);
 }
 
+void	heredoc_sigint(int signum)
+{
+	g_sig = signum;
+	write(1, "\n", 1);
+	close(0);
+}
+
+void	heredoc_child(int fds[2], char *delimiter, t_shell *shell, char **env)
+{
+	char	*str;
+
+	close(fds[0]);
+	signal(SIGINT, heredoc_sigint);
+	str = readline("heredoc> ");
+	while (str && ft_strncmp(str, delimiter, -1) != 0)
+	{
+		str = find_and_expand(str, env, shell);
+		ft_putendl_fd(str, fds[1]);
+		free(str);
+		str = readline("heredoc> ");
+	}
+	close(fds[1]);
+	free_strs(env);
+	clear_shell(shell);
+	exit(g_sig == SIGINT);
+}
+
 bool	handle_heredoc(t_tree *node, t_context *context, char **env, t_shell *shell)
 {
 	int		fds[2];
-	char	*str;
+	int		status;
+	int		pid;
 
 	if (pipe(fds) == -1)
 	{
@@ -31,18 +59,14 @@ bool	handle_heredoc(t_tree *node, t_context *context, char **env, t_shell *shell
 		context->error = 1;
 		return (false);
 	}
-	str = readline("heredoc> ");
-	while (str && ft_strncmp(str, node->right->cmd.strs[0], -1) != 0)
-	{
-		str = find_and_expand(str, env, shell);
-		ft_putendl_fd(str, fds[1]);
-		free(str);
-		str = readline("heredoc> ");
-	}
+	pid = fork();
+	if (pid == 0)
+		heredoc_child(fds, node->right->cmd.strs[0], shell, env);
+	waitpid(pid, &status, 0);
 	close(context->input);
 	context->input = fds[0];
 	close(fds[1]);
-	return (str != NULL);
+	return (WEXITSTATUS(status) == 0);
 }
 
 bool	handle_pipe(t_tree *node, t_context *context, char **env, t_shell *shell)
