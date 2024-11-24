@@ -29,6 +29,6 @@ ignore empty strings
 [x]	empty env breaks export (check others too)
 [x]	ctrl c cancels all heredocs;
 [x]	ctrl d in heredoc doesnt cancel other heredocs
-(testcase) echo -n -n -nnnnnnn -nnnn BATMAN!
+[x]	(testcase) echo -n -n -nnnnnnn -nnnn BATMAN!
 (testcase) $1234 (takes only the first digit it sees)
 guard close syscall from -1;

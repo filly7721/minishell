@@ -1,5 +1,30 @@
 #include "minishell.h"
 
+char	*get_arg_flags(char **args, int *i)
+{
+	char	*flags;
+	int		j;
+
+	flags = ft_strdup("");
+	while (args[*i] != NULL && *(args[*i]) == '-')
+	{
+		j = 1;
+		while (args[*i][j])
+		{
+			if (ft_strchr(flags, args[*i][j]) == NULL)
+			{
+				flags = ft_strappend(flags, " ");
+				if (!flags)
+					return (NULL);
+				flags[ft_strlen(flags) - 1] = args[*i][j];
+			}
+			j++;
+		}
+		(*i)++;
+	}
+	return (flags);
+}
+
 bool	exit_atoi(char *str, int *num)
 {
 	int	sign;
@@ -148,14 +173,18 @@ int	ft_cd(t_shell *shell, char **env)
 int	ft_echo(t_context *context)
 {
 	char	**strs;
+	char	*flags;
 	int		fd;
+	int		i;
 
 	fd = context->output;
 	if (fd == -1)
 		fd = 1;
-	strs = context->args + 1;
-	if (context->args[1] && ft_strncmp(context->args[1], "-n", -1) == 0)
-		strs++;
+	i = 1;
+	flags = get_arg_flags(context->args, &i);
+	if (!flags)
+		return (ft_putstr_fd("An error has occurred\n", 2), 1);
+	strs = context->args + i;
 	if (*strs)
 		ft_putstr_fd(*strs++, fd);
 	while (*strs)
@@ -163,8 +192,9 @@ int	ft_echo(t_context *context)
 		ft_putchar_fd(' ', fd);
 		ft_putstr_fd(*strs++, fd);
 	}
-	if (!context->args[1] || ft_strncmp(context->args[1], "-n", -1) != 0)
+	if (ft_strchr(flags, 'n') == NULL)
 		ft_putchar_fd('\n', fd);
+	free(flags);
 	return (0);
 }
 
