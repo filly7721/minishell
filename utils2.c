@@ -61,3 +61,10 @@ char	**quote_split(char *str, char c)
 	}
 	return (res);
 }
+
+void	check_close(int fd)
+{
+	if (fd < 0)
+		return ;
+	close(fd);
+}

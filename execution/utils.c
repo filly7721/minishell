@@ -22,9 +22,9 @@ void	free_context(t_context *context)
 	context->args = NULL;
 	free(context->cmd);
 	context->cmd = NULL;
-	close(context->input);
+	check_close(context->input);
 	context->input = -1;
-	close(context->output);
+	check_close(context->output);
 	context->output = -1;
 	context->error = 0;
 	free(context);

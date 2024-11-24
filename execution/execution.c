@@ -41,9 +41,9 @@ int	execute_cmd(t_context *context, char **env)
 		return (status);
 	}
 	if (context->input != -1)
-		(dup2(context->input, 0), close(context->input));
+		(dup2(context->input, 0), check_close(context->input));
 	if (context->output != -1)
-		(dup2(context->output, 1), close(context->output));
+		(dup2(context->output, 1), check_close(context->output));
 	if (!context->args[0])
 		return (free_strs(env), 0);
 	if (context->cmd)

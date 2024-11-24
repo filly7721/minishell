@@ -28,7 +28,7 @@ bool	handle_input(t_tree *node, char **env, t_context *context)
 		close(fd);
 	else
 	{
-		close(context->input);
+		check_close(context->input);
 		context->input = fd;
 	}
 	return (traverse_tree(node->left, env, context));
@@ -36,7 +36,7 @@ bool	handle_input(t_tree *node, char **env, t_context *context)
 
 bool	handle_output(t_tree *node, char **env, t_context *context, bool append)
 {
-	close(context->output);
+	check_close(context->output);
 	if (append)
 		context->output = open(node->right->cmd.strs[0],
 				O_WRONLY | O_CREAT | O_APPEND, 0644);

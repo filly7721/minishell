@@ -114,4 +114,7 @@ bool		add_env(t_list **list, char *str);
 t_list		*find_lst(t_list *list, char *str, int len);
 char		*find_and_expand(char *str, char **env, t_shell *shell);
 void		onsignint(int signum);
+
+void		check_close(int fd);
+
 #endif
