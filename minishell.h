@@ -116,5 +116,6 @@ char		*find_and_expand(char *str, char **env, t_shell *shell);
 void		onsignint(int signum);
 
 void		check_close(int fd);
+void		flatten_whitespace(char *str);
 
 #endif

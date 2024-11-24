@@ -67,11 +67,25 @@ bool	validate_string(char *str)
 				return (false);
 			tokens = 0;
 		}
-		else if (*str != ' ' || *str != '\t')
+		else if (*str != ' ' && *str != '\t')
 			tokens++;
 		if (str == NULL)
 			return (false);
 		str++;
 	}
 	return (true);
+}
+
+void	flatten_whitespace(char *str)
+{
+	while (*str)
+	{
+		if (*str == '"' || *str == '\'')
+			str = ft_strchr(str + 1, *str);
+		else if (*str > 8 && *str < 13)
+			*str = ' ';
+		if (str == NULL)
+			return ;
+		str++;
+	}
 }

@@ -63,7 +63,10 @@ char	*get_input(void)
 			return (NULL);
 		add_history(str);
 		if (validate_string(str))
+		{
+			flatten_whitespace(str);
 			return (str);
+		}
 		ft_putstr_fd("parse error\n", 2);
 		free(str);
 	}
