@@ -52,21 +52,27 @@ void	print_tree(t_tree *head, int depth)
 char	*get_input(void)
 {
 	char	*str;
+	int		i;
 	
 	while (1)
 	{
+		i = 0;
 		if (isatty(0))
 			str = readline("megashell> ");
 		else
 			str = readline("");
 		if (!str)
 			return (NULL);
-		add_history(str);
-		if (validate_string(str))
+		flatten_whitespace(str);
+		while (str[i] == ' ')
+			i++;
+		if (str[i] == '\0')
 		{
-			flatten_whitespace(str);
-			return (str);
+			free(str);
+			continue ;
 		}
+		if ((add_history(str), true) && validate_string(str))
+			return (str);
 		ft_putstr_fd("parse error\n", 2);
 		free(str);
 	}

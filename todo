@@ -1,7 +1,7 @@
-implement word rules in get_word();
-modify shlvl at program start
-if string is empty do nothing
-ignore empty strings
+[x]	implement word rules in get_word();
+[x]	modify shlvl at program start
+[x]	if string is empty do nothing
+[x]	ignore empty strings
 
 	BUILTSINS
 [x]	cd with only a relative or absolute path
