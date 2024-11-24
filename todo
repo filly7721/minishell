@@ -33,5 +33,5 @@ ignore empty strings
 [x]	(testcase) $1234 (takes only the first digit it sees)
 [x]	guard close syscall from -1;
 [x]	count words as token in validate
-execve directory errors should print the directory msg if there is a slash
+[x]	execve directory errors should print the directory msg if there is a slash
 number start in var in export

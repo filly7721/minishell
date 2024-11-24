@@ -17,9 +17,12 @@ int	get_execution_error(char *cmd)
 	ft_putstr_fd(cmd, 2);
 	dir = opendir(cmd);
 	if (dir)
-		return (closedir(dir), ft_putstr_fd(": is a directory\n", 2), 126);
-	if (is_whitespace(cmd))
+	{
+		closedir(dir);
+		if (ft_strchr(cmd, '/'))
+			return (ft_putstr_fd(": is a directory\n", 2), 126);
 		return (ft_putstr_fd(": Command not found\n", 2), 127);
+	}
 	if (errnum == EACCES)
 		return (ft_putstr_fd(": Permission denied\n", 2), 126);
 	if (ft_strchr(cmd, '/') != NULL)
