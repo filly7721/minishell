@@ -22,6 +22,8 @@ char	*validate_redirections(char *str)
 			str = ft_strchr(str + 1, *str);
 		else if (ft_strchr(" <>|&", *str))
 			break ;
+		if (!str)
+			return (NULL);
 		str++;
 	}
 	return (str - 1);
