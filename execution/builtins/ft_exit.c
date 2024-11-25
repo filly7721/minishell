@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exit.c                                             :+:      :+:    :+:   */
+/*   ft_exit.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ssiddiqu <ssiddiqu@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 17:40:27 by ssiddiqu          #+#    #+#             */
-/*   Updated: 2024/11/25 17:41:04 by ssiddiqu         ###   ########.fr       */
+/*   Updated: 2024/11/25 20:02:26 by ssiddiqu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,13 +41,11 @@ int	ft_exit(t_shell *shell, char **env)
 {
 	int	status;
 
-	if (shell->context->args[1] && shell->context->args[2])
-		return (ft_putstr_fd("megashell: exit: too many arguments\n", 2), 1);
-	free_strs(env);
-	if (!shell->context->args[1])
+	if (shell->context->args[1] == NULL)
 	{
 		status = shell->status;
-		(clear_shell(shell), ft_putendl_fd("exit", 2), exit(status));
+		(free_strs(env), clear_shell(shell));
+		(ft_putendl_fd("exit", 2), exit(status));
 	}
 	if (exit_atoi(shell->context->args[1], &status) == false)
 	{
@@ -55,8 +53,12 @@ int	ft_exit(t_shell *shell, char **env)
 		ft_putstr_fd("exit: ", 2);
 		ft_putstr_fd(shell->context->args[1], 2);
 		ft_putendl_fd(": numeric argument required", 2);
-		status = 255;
+		(free_strs(env), clear_shell(shell));
+		exit(255);
 	}
+	if (shell->context->args[2])
+		return (ft_putstr_fd("megashell: exit: too many arguments\n", 2), 1);
+	free_strs(env);
 	clear_shell(shell);
 	exit(status % 256);
 }
