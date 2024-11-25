@@ -6,7 +6,7 @@
 /*   By: ssiddiqu <ssiddiqu@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 15:18:31 by ssiddiqu          #+#    #+#             */
-/*   Updated: 2024/11/25 16:23:43 by ssiddiqu         ###   ########.fr       */
+/*   Updated: 2024/11/25 19:25:39 by ssiddiqu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,8 +64,8 @@ int	execute_cmd(t_context *context, char **env)
 bool	traverse_tree(t_tree *node, char **env, t_context *context)
 {
 	if (node->cmd.type == PIPE)
-		return (traverse_tree(node->left, env, context)
-			&& traverse_tree(node->right, env, context->next));
+		(traverse_tree(node->left, env, context),
+			traverse_tree(node->right, env, context->next));
 	else if (node->cmd.type == HEREDOC)
 		return (traverse_tree(node->left, env, context));
 	else if (node->cmd.type == WORD)
@@ -76,9 +76,7 @@ bool	traverse_tree(t_tree *node, char **env, t_context *context)
 		return (handle_output(node, env, context, true));
 	else if (node->cmd.type == OUTPUT)
 		return (handle_output(node, env, context, false));
-	else
-		ft_putstr_fd("unknown type in tree\n", 2);
-	return (false);
+	return (true);
 }
 
 bool	execute_context(t_shell *shell, char **env, pid_t *pid)

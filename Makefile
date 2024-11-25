@@ -14,7 +14,7 @@ READLINE	=	-L/opt/vagrant/embedded/lib/ -lreadline
 
 CFLAGS		=	-Wall -Wextra -Werror
 CFLAGS		+=	-Ilibft -I./ -I/opt/vagrant/embedded/include/readline -I/opt/vagrant/embedded/include
-CFLAGS		+=	-g3 
+
 NAME		=	minishell
 
 all			:	${NAME}
