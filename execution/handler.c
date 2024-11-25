@@ -6,7 +6,7 @@
 /*   By: ssiddiqu <ssiddiqu@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 15:18:39 by ssiddiqu          #+#    #+#             */
-/*   Updated: 2024/11/25 15:18:40 by ssiddiqu         ###   ########.fr       */
+/*   Updated: 2024/11/25 19:56:38 by ssiddiqu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,11 @@ bool	handle_input(t_tree *node, char **env, t_context *context)
 {
 	int	fd;
 
+	if (node->right->cmd.strs[0] == NULL)
+	{
+		context->error = 1;
+		return (ft_putstr_fd("ambiguous redirect\n", 2), false);
+	}
 	fd = open(node->right->cmd.strs[0], O_RDONLY);
 	if (fd == -1)
 	{
@@ -37,12 +42,9 @@ bool	handle_input(t_tree *node, char **env, t_context *context)
 		return (false);
 	}
 	if (find_heredoc(node->left))
-		close(fd);
-	else
-	{
-		check_close(context->input);
-		context->input = fd;
-	}
+		return (close(fd), traverse_tree(node->left, env, context));
+	check_close(context->input);
+	context->input = fd;
 	return (traverse_tree(node->left, env, context));
 }
 

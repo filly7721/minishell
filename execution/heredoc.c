@@ -6,7 +6,7 @@
 /*   By: ssiddiqu <ssiddiqu@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 15:18:36 by ssiddiqu          #+#    #+#             */
-/*   Updated: 2024/11/25 16:26:35 by ssiddiqu         ###   ########.fr       */
+/*   Updated: 2024/11/25 19:41:07 by ssiddiqu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ bool	handle_heredoc(t_tree *node, t_context *context,
 	if (pid == 0)
 		heredoc_child(fds, node->right->cmd.strs[0], shell, env);
 	waitpid(pid, &status, 0);
-	close(context->input);
+	check_close(context->input);
 	context->input = fds[0];
 	close(fds[1]);
 	return (WEXITSTATUS(status) == 0);
