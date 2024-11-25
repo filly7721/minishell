@@ -6,7 +6,7 @@
 /*   By: ssiddiqu <ssiddiqu@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 15:18:28 by ssiddiqu          #+#    #+#             */
-/*   Updated: 2024/11/25 18:06:47 by ssiddiqu         ###   ########.fr       */
+/*   Updated: 2024/11/25 20:29:19 by ssiddiqu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ int	execute_builtin(t_shell *shell, char **env)
 
 	clear_context_list(&shell->context->next);
 	status = 1;
+	signal(SIGPIPE, SIG_IGN);
 	if (ft_strncmp(shell->context->cmd, "echo", -1) == 0)
 		status = ft_echo(shell->context);
 	else if (ft_strncmp(shell->context->cmd, "pwd", -1) == 0)
@@ -58,6 +59,7 @@ int	execute_builtin(t_shell *shell, char **env)
 	else if (ft_strncmp(shell->context->cmd, "exit", -1) == 0)
 		status = ft_exit(shell, env);
 	free_context(shell->context);
+	signal(SIGPIPE, SIG_DFL);
 	shell->context = NULL;
 	free_strs(env);
 	return (status);
