@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   verify.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ssiddiqu <ssiddiqu@student.42abudhabi.a    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/11/25 15:18:02 by ssiddiqu          #+#    #+#             */
+/*   Updated: 2024/11/25 16:35:00 by ssiddiqu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 /// @brief a therapist
@@ -74,18 +86,4 @@ bool	validate_string(char *str)
 		str++;
 	}
 	return (true);
-}
-
-void	flatten_whitespace(char *str)
-{
-	while (*str)
-	{
-		if (*str == '"' || *str == '\'')
-			str = ft_strchr(str + 1, *str);
-		else if (*str > 8 && *str < 13)
-			*str = ' ';
-		if (str == NULL)
-			return ;
-		str++;
-	}
 }

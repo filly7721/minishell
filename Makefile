@@ -1,8 +1,9 @@
-PARSE_SRCS	=	utils.c rec_des.c cleanup.c verify.c
+PARSE_SRCS	=	utils.c rec_des.c cleanup.c verify.c cleanup2.c
 
-EXEC_SRCS	=	execution.c utils.c handler.c heredoc.c builtins.c 
+EXEC_SRCS	=	execution.c utils.c handler.c heredoc.c utils2.c
+EXEC_SRCS	+=	${addprefix builtins/, ft_cd.c ft_echo.c ft_env.c ft_exit.c ft_export.c ft_pwd.c ft_unset.c builtins.c}
 
-SRCS		=	utils.c main.c env.c utils2.c
+SRCS		=	utils.c main.c env.c utils2.c env_utils.c
 SRCS		+=	${addprefix parse/, ${PARSE_SRCS}} ${addprefix execution/, ${EXEC_SRCS}}
 
 OBJS		=	${SRCS:.c=.o}

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ssiddiqu <ssiddiqu@student.42abudhabi.a    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/11/25 15:18:41 by ssiddiqu          #+#    #+#             */
+/*   Updated: 2024/11/25 16:23:19 by ssiddiqu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 t_context	*create_context(void)
@@ -71,4 +83,22 @@ char	*get_path(char *cmd, char **env)
 		free(path);
 	}
 	return (free_strs(paths), NULL);
+}
+
+void	print_signal_errors(int status)
+{
+	if (status == SIGINT)
+		ft_putstr_fd("\n", 2);
+	else if (status == SIGQUIT)
+	{
+		ft_putstr_fd("Quit: ", 2);
+		ft_putnbr_fd(status, 2);
+		ft_putstr_fd(": womp womp\n", 2);
+	}
+	else if (status == SIGSEGV)
+	{
+		ft_putstr_fd("Segmentation fault: ", 2);
+		ft_putnbr_fd(status, 2);
+		ft_putstr_fd(": is bro dereferencing null 💀\n", 2);
+	}
 }

@@ -1,4 +1,16 @@
-#ifndef MINISHELL_H	
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ssiddiqu <ssiddiqu@student.42abudhabi.a    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/11/25 15:26:43 by ssiddiqu          #+#    #+#             */
+/*   Updated: 2024/11/25 18:17:57 by ssiddiqu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef MINISHELL_H
 # define MINISHELL_H
 
 # include <stdlib.h>
@@ -75,13 +87,17 @@ bool		expand_tree(t_tree *node, char **env, t_shell *shell);
 int			execute(t_shell *shell, char **env);
 bool		traverse_tree(t_tree *node, char **env, t_context *context);
 int			execute_cmd(t_context *context, char **env);
+void		print_signal_errors(int status);
 
 int			execute_builtin(t_shell *context, char **env);
 bool		is_builtin(char *str);
 
-bool		handle_pipe(t_tree *node, t_context *context, char **env, t_shell *shell);
-bool		handle_heredoc(t_tree *node, t_context *context, char **env, t_shell *shell);
-bool		premature_visitation(t_tree *node, t_context *context, char **env, t_shell *shell);
+bool		handle_pipe(t_tree *node, t_context *context,
+				char **env, t_shell *shell);
+bool		handle_heredoc(t_tree *node, t_context *context,
+				char **env, t_shell *shell);
+bool		premature_visitation(t_tree *node, t_context *context,
+				char **env, t_shell *shell);
 
 bool		handle_input(t_tree *node, char **env, t_context *context);
 bool		handle_output(t_tree *node, char **env,
@@ -101,6 +117,7 @@ char		**quote_split(char *str, char c);
 
 bool		trim_tree(t_tree *node, char **env);
 bool		removing_quotes(t_tree *node, char **env);
+bool		split_args(t_tree *node);
 
 void		clear_shell(t_shell *shell);
 t_shell		*create_shell(char **env);
@@ -117,5 +134,16 @@ void		onsignint(int signum);
 
 void		check_close(int fd);
 void		flatten_whitespace(char *str);
+int			shlvl_atoi(char *str);
+
+int			ft_echo(t_context *context);
+int			ft_pwd(t_shell *shell, char **env, t_context *context);
+int			ft_unset(t_shell *shell);
+int			ft_export(t_shell *shell);
+int			ft_cd(t_shell *shell, char **env);
+int			ft_exit(t_shell *shell, char **env);
+int			ft_env(t_shell *shell, char **env);
+char		*get_pwd(t_shell *shell, char **env);
+char		*get_arg_flags(char **args, int *i);
 
 #endif

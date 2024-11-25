@@ -1,24 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   heredoc.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ssiddiqu <ssiddiqu@student.42abudhabi.a    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/11/25 15:18:36 by ssiddiqu          #+#    #+#             */
+/*   Updated: 2024/11/25 16:26:35 by ssiddiqu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
-
-char	*find_and_expand(char *str, char **env, t_shell *shell)
-{
-	int	i;
-
-	i = 0;
-	while (str[i])
-	{
-		if (str[i] == '$')
-		{
-			str[i++] = '\0';
-			str = expanded_str(str, str + i--, env, shell);
-			if (!str)
-				return (NULL);
-			continue ;
-		}
-		i++;
-	}
-	return (str);
-}
 
 void	heredoc_sigint(int signum)
 {
@@ -47,7 +39,8 @@ void	heredoc_child(int fds[2], char *delimiter, t_shell *shell, char **env)
 	exit(g_sig == SIGINT);
 }
 
-bool	handle_heredoc(t_tree *node, t_context *context, char **env, t_shell *shell)
+bool	handle_heredoc(t_tree *node, t_context *context,
+		char **env, t_shell *shell)
 {
 	int		fds[2];
 	int		status;
@@ -69,7 +62,8 @@ bool	handle_heredoc(t_tree *node, t_context *context, char **env, t_shell *shell
 	return (WEXITSTATUS(status) == 0);
 }
 
-bool	handle_pipe(t_tree *node, t_context *context, char **env, t_shell *shell)
+bool	handle_pipe(t_tree *node, t_context *context,
+	char **env, t_shell *shell)
 {
 	int	fds[2];
 
@@ -93,7 +87,8 @@ bool	handle_pipe(t_tree *node, t_context *context, char **env, t_shell *shell)
 	return (premature_visitation(node->right, context->next, env, shell));
 }
 
-bool	premature_visitation(t_tree *node, t_context *context, char **env, t_shell *shell)
+bool	premature_visitation(t_tree *node, t_context *context,
+	char **env, t_shell *shell)
 {
 	if (node->cmd.type == WORD)
 		return (true);

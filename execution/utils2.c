@@ -1,42 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   utils2.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ssiddiqu <ssiddiqu@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/25 15:17:57 by ssiddiqu          #+#    #+#             */
-/*   Updated: 2024/11/25 15:17:58 by ssiddiqu         ###   ########.fr       */
+/*   Created: 2024/11/25 16:25:56 by ssiddiqu          #+#    #+#             */
+/*   Updated: 2024/11/25 16:27:10 by ssiddiqu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	free_strs(char **strs)
+char	*find_and_expand(char *str, char **env, t_shell *shell)
 {
 	int	i;
 
 	i = 0;
-	if (strs == NULL)
-		return ;
-	while (strs[i] != NULL)
-		free(strs[i++]);
-	free(strs);
-}
-
-char	*ft_strappend(char *str1, char *str2)
-{
-	char	*res;
-
-	if (str1 == NULL || str2 == NULL)
-		return (NULL);
-	res = ft_strjoin(str1, str2);
-	free(str1);
-	return (res);
-}
-
-void	free_null(void **ptr)
-{
-	free(*ptr);
-	*ptr = NULL;
+	while (str[i])
+	{
+		if (str[i] == '$')
+		{
+			str[i++] = '\0';
+			str = expanded_str(str, str + i--, env, shell);
+			if (!str)
+				return (NULL);
+			continue ;
+		}
+		i++;
+	}
+	return (str);
 }

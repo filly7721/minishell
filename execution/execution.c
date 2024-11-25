@@ -1,11 +1,16 @@
-#include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   execution.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ssiddiqu <ssiddiqu@student.42abudhabi.a    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/11/25 15:18:31 by ssiddiqu          #+#    #+#             */
+/*   Updated: 2024/11/25 16:23:43 by ssiddiqu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-bool	is_whitespace(char *str)
-{
-	while (*str == ' ' || * str == '\t')
-		str++;
-	return (*str == '\0');
-}
+#include "minishell.h"
 
 int	get_execution_error(char *cmd)
 {
@@ -105,24 +110,6 @@ bool	execute_context(t_shell *shell, char **env, pid_t *pid)
 	return (true);
 }
 
-void	print_signal_errors(int status)
-{
-	if (status == SIGINT)
-		ft_putstr_fd("\n", 2);
-	else if (status == SIGQUIT)
-	{
-		ft_putstr_fd("Quit: ", 2);
-		ft_putnbr_fd(status, 2);
-		ft_putstr_fd(": womp womp\n", 2);
-	}
-	else if (status == SIGSEGV)
-	{
-		ft_putstr_fd("Segmentation fault: ", 2);
-		ft_putnbr_fd(status, 2);
-		ft_putstr_fd(": is bro dereferencing null 💀\n", 2);
-	}
-}
-
 int	execute(t_shell *shell, char **env)
 {
 	pid_t		pid;
@@ -133,7 +120,8 @@ int	execute(t_shell *shell, char **env)
 		return (ft_putstr_fd("An error has occurred: ", 2), 1);
 	signal(SIGINT, SIG_IGN);
 	if (premature_visitation(shell->tree, shell->context, env, shell) == false)
-		return (clear_context_list(&shell->context), free_tree(&shell->tree), free_strs(env), 0);
+		return (clear_context_list(&shell->context),
+			free_tree(&shell->tree), free_strs(env), 0);
 	traverse_tree(shell->tree, env, shell->context);
 	free_tree(&shell->tree);
 	if (shell->context->next == NULL && is_builtin(shell->context->cmd))
